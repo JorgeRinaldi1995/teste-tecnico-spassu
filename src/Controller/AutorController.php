@@ -56,8 +56,9 @@ class AutorController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/editar', name: 'autor_editar', methods: ['GET', 'POST'])]
+    #[Route('/{codau}/editar', name: 'autor_editar', methods: ['GET', 'POST'])]
     public function editar(
+        #[MapEntity(id: 'codau')] Autor $autor,
         Request $request,
         Autor $autor,
         AutorRepository $repository
@@ -69,7 +70,7 @@ class AutorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $repository->save($autor);
-
+            $this->addFlash('success', 'Autor salvo com sucesso.');
             return $this->redirectToRoute('autor_index');
         }
 
@@ -81,6 +82,7 @@ class AutorController extends AbstractController
 
     #[Route('/{id}/remover', name: 'autor_remover', methods: ['POST'])]
     public function remover(
+        #[MapEntity(id: 'codau')] Autor $autor,
         Autor $autor,
         AutorRepository $repository
     ): Response {
