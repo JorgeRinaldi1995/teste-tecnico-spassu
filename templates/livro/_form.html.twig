@@ -1,0 +1,14 @@
+{# _form.html.twig #}
+
+{{ form_start(form) }}
+
+{{ form_row(form.titulo) }}
+{{ form_row(form.editora) }}
+{{ form_row(form.edicao) }}
+{{ form_row(form.anoPublicacao) }}
+
+<button class="btn btn-success">
+    {{ button_label|default('Salvar') }}
+</button>
+
+{{ form_end(form) }}

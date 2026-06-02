@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Livro{% endblock %}
+
+{% block body %}
+
+<h1 class="mb-4">
+    Editar Livro
+</h1>
+
+{% include 'livro/_form.html.twig' with {
+    form: form,
+    button_label: 'Atualizar'
+} %}
+
+{% endblock %}

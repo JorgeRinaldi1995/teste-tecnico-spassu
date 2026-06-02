@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Novo Livro{% endblock %}
+
+{% block body %}
+
+<h1 class="mb-4">Cadastrar Livro</h1>
+
+{% include 'livro/_form.html.twig' with {
+    form: form,
+    button_label: 'Cadastrar Livro'
+} %}
+
+{% endblock %}

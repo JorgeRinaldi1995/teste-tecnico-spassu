@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Detalhes do Livro{% endblock %}
+
+{% block body %}
+
+<h1 class="mb-4">
+    Detalhes do Livro
+</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th width="200">Código</th>
+        <td>{{ livro.codl }}</td>
+    </tr>
+
+    <tr>
+        <th>Título</th>
+        <td>{{ livro.titulo }}</td>
+    </tr>
+
+    <tr>
+        <th>Editora</th>
+        <td>{{ livro.editora }}</td>
+    </tr>
+
+    <tr>
+        <th>Edição</th>
+        <td>{{ livro.edicao }}</td>
+    </tr>
+
+    <tr>
+        <th>Ano de Publicação</th>
+        <td>{{ livro.anoPublicacao }}</td>
+    </tr>
+</table>
+
+<a
+    href="{{ path('livro_editar', {'id': livro.codl}) }}"
+    class="btn btn-warning"
+>
+    Editar
+</a>
+
+<a
+    href="{{ path('livro_index') }}"
+    class="btn btn-secondary"
+>
+    Voltar
+</a>
+
+{% endblock %}
