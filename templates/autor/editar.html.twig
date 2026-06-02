@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>Editar Autor</h1>
+
+{% include 'autor/_form.html.twig' with {
+    form: form,
+    button_label: 'Atualizar'
+} %}
+
+{% endblock %}

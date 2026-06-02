@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>Detalhes do Autor</h1>
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Nome</th>
+        <td>{{ autor.nome }}</td>
+    </tr>
+
+</table>
+
+<h3>Livros deste autor</h3>
+
+<ul>
+
+    {% for livro in autor.livros %}
+        <li>
+            {{ livro.titulo }}
+        </li>
+    {% else %}
+        <li>Nenhum livro cadastrado.</li>
+    {% endfor %}
+
+</ul>
+
+<a href="{{ path('autor_index') }}"
+   class="btn btn-secondary">
+    Voltar
+</a>
+
+{% endblock %}

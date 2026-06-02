@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>Detalhes do Assunto</h1>
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Código</th>
+        <td>{{ assunto.codas }}</td>
+    </tr>
+
+    <tr>
+        <th>Descrição</th>
+        <td>{{ assunto.descricao }}</td>
+    </tr>
+
+</table>
+
+<h3>Livros relacionados</h3>
+
+<ul>
+
+    {% for livro in assunto.livros %}
+        <li>{{ livro.titulo }}</li>
+    {% else %}
+        <li>Nenhum livro associado.</li>
+    {% endfor %}
+
+</ul>
+
+<a href="{{ path('assunto_index') }}"
+   class="btn btn-secondary">
+    Voltar
+</a>
+
+{% endblock %}

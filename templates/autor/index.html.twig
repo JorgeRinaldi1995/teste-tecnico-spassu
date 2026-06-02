@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between mb-3">
+
+    <h1>Autores</h1>
+
+    <a href="{{ path('autor_novo') }}"
+       class="btn btn-primary">
+        Novo Autor
+    </a>
+
+</div>
+
+<table class="table table-striped">
+
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Livros</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for autor in autores %}
+        <tr>
+
+            <td>{{ autor.codau }}</td>
+
+            <td>{{ autor.nome }}</td>
+
+            <td>{{ autor.livros|length }}</td>
+
+            <td>
+
+                <a href="{{ path('autor_show', {'codau': autor.codau}) }}"
+                   class="btn btn-info btn-sm">
+                    Ver
+                </a>
+
+                <a href="{{ path('autor_editar', {'id': autor.codau}) }}"
+                   class="btn btn-warning btn-sm">
+                    Editar
+                </a>
+
+            </td>
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

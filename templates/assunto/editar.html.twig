@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>Editar Assunto</h1>
+
+{% include 'assunto/_form.html.twig' with {
+    form: form,
+    button_label: 'Atualizar'
+} %}
+
+{% endblock %}

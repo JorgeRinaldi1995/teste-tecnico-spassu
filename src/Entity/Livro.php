@@ -2,8 +2,13 @@
 
 namespace App\Entity;
 
+use App\Entity\Autor;
 use App\Repository\LivroRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 #[ORM\Entity(repositoryClass: LivroRepository::class)]
 #[ORM\Table(name: 'livro')]
@@ -25,6 +30,52 @@ class Livro
 
     #[ORM\Column(name: 'ano_publicacao', length: 4)]
     private ?string $anoPublicacao = null;
+
+    #[ORM\ManyToMany(
+        targetEntity: Autor::class,
+        inversedBy: 'livros'
+    )]
+    #[ORM\JoinTable(name: 'livro_autor')]
+    #[ORM\JoinColumn(
+        name: 'livro_codl',
+        referencedColumnName: 'codl'
+    )]
+    #[ORM\InverseJoinColumn(
+        name: 'autor_codau',
+        referencedColumnName: 'codau'
+    )]
+    #[Assert\Count(
+        min: 1,
+        minMessage: 'Selecione pelo menos um autor.'
+    )]
+
+    private Collection $autores;
+
+    #[ORM\ManyToMany(
+        targetEntity: Assunto::class,
+        inversedBy: 'livros'
+    )]
+    #[ORM\JoinTable(name: 'livro_assunto')]
+    #[ORM\JoinColumn(
+        name: 'livro_codl',
+        referencedColumnName: 'codl'
+    )]
+    #[ORM\InverseJoinColumn(
+        name: 'assunto_codas',
+        referencedColumnName: 'codas'
+    )]
+    #[Assert\Count(
+        min: 1,
+        minMessage: 'Selecione pelo menos um assunto.'
+    )]
+
+    private Collection $assuntos;
+
+    public function __construct()
+    {
+        $this->autores = new ArrayCollection();
+        $this->assuntos = new ArrayCollection();
+    }
 
     public function getCodl(): ?int
     {
@@ -72,6 +123,48 @@ class Livro
     public function setAnoPublicacao(string $anoPublicacao): self
     {
         $this->anoPublicacao = $anoPublicacao;
+        return $this;
+    }
+
+    public function getAutores(): Collection
+    {
+        return $this->autores;
+    }
+
+    public function addAutor(Autor $autor): self
+    {
+        if (!$this->autores->contains($autor)) {
+            $this->autores->add($autor);
+        }
+
+        return $this;
+    }
+
+    public function removeAutor(Autor $autor): self
+    {
+        $this->autores->removeElement($autor);
+
+        return $this;
+    }
+
+    public function getAssuntos(): Collection
+    {
+        return $this->assuntos;
+    }
+
+    public function addAssunto(Assunto $assunto): self
+    {
+        if (!$this->assuntos->contains($assunto)) {
+            $this->assuntos->add($assunto);
+        }
+
+        return $this;
+    }
+
+    public function removeAssunto(Assunto $assunto): self
+    {
+        $this->assuntos->removeElement($assunto);
+
         return $this;
     }
 }

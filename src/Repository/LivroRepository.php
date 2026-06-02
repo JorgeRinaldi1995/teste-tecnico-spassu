@@ -30,4 +30,25 @@ class LivroRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getAutores(): Collection
+    {
+        return $this->autores;
+    }
+
+    public function addAutor(Autor $autor): self
+    {
+        if (!$this->autores->contains($autor)) {
+            $this->autores->add($autor);
+        }
+
+        return $this;
+    }
+
+    public function removeAutor(Autor $autor): self
+    {
+        $this->autores->removeElement($autor);
+
+        return $this;
+    }
 }

@@ -7,6 +7,24 @@
 {{ form_row(form.edicao) }}
 {{ form_row(form.anoPublicacao) }}
 
+<div class="mb-3">
+    {{ form_label(form.autores) }}
+    {{ form_widget(form.autores, {
+        attr: {
+            class: 'form-select'
+        }
+    }) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.assuntos) }}
+    {{ form_widget(form.assuntos, {
+        attr: {
+            class: 'form-select'
+        }
+    }) }}
+</div>
+
 <button class="btn btn-success">
     {{ button_label|default('Salvar') }}
 </button>

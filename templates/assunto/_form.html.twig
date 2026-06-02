@@ -1,0 +1,14 @@
+{{ form_start(form) }}
+
+{{ form_row(form.descricao) }}
+
+<button class="btn btn-success">
+    {{ button_label|default('Salvar') }}
+</button>
+
+<a href="{{ path('assunto_index') }}"
+   class="btn btn-secondary">
+    Voltar
+</a>
+
+{{ form_end(form) }}
