@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\AutorRepository;
 
 #[ORM\Entity(repositoryClass: AutorRepository::class)]
 #[ORM\Table(name: 'autor')]
@@ -13,10 +15,15 @@ class Autor
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'codau')]
-    private ?int $codau = null;
+    private int $codau;
 
+    #[Assert\NotBlank(message: 'O nome do autor é obrigatório.')]
+    #[Assert\Length(
+        max: 40,
+        maxMessage: 'O nome deve ter no máximo {{ limit }} caracteres.'
+    )]
     #[ORM\Column(length: 40)]
-    private ?string $nome = null;
+    private string $nome;
 
     #[ORM\ManyToMany(targetEntity: Livro::class, mappedBy: 'autores')]
     private Collection $livros;
@@ -26,12 +33,12 @@ class Autor
         $this->livros = new ArrayCollection();
     }
 
-    public function getCodau(): ?int
+    public function getCodau(): int
     {
         return $this->codau;
     }
 
-    public function getNome(): ?string
+    public function getNome(): string
     {
         return $this->nome;
     }

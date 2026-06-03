@@ -15,6 +15,7 @@ class AutorType extends AbstractType
         $builder
             ->add('nome', TextType::class, [
                 'label' => 'Nome do Autor',
+                'required' => true,
                 'attr' => [
                     'maxlength' => 40,
                 ],

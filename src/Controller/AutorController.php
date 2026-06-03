@@ -58,9 +58,9 @@ class AutorController extends AbstractController
 
     #[Route('/{codau}/editar', name: 'autor_editar', methods: ['GET', 'POST'])]
     public function editar(
-        #[MapEntity(id: 'codau')] Autor $autor,
-        Request $request,
+        #[MapEntity(id: 'codau')] 
         Autor $autor,
+        Request $request,
         AutorRepository $repository
     ): Response {
         $form = $this->createForm(AutorType::class, $autor);
@@ -82,7 +82,7 @@ class AutorController extends AbstractController
 
     #[Route('/{id}/remover', name: 'autor_remover', methods: ['POST'])]
     public function remover(
-        #[MapEntity(id: 'codau')] Autor $autor,
+        #[MapEntity(id: 'codau')] 
         Autor $autor,
         AutorRepository $repository
     ): Response {

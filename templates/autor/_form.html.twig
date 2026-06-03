@@ -1,6 +1,7 @@
 {{ form_start(form) }}
 
 {{ form_row(form.nome) }}
+{{ form_errors(form.nome) }}
 
 <button class="btn btn-success">
     {{ button_label|default('Salvar') }}
