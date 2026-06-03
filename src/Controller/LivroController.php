@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 class LivroController extends AbstractController
 {
@@ -40,16 +41,24 @@ class LivroController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'livro_show', methods: ['GET'])]
-    public function show(Livro $livro): Response
+    #[Route('/{codl}', name: 'livro_show', methods: ['GET'])]
+    public function show(
+        #[MapEntity(id: 'codl')] 
+        Livro $livro
+    ): Response
     {
         return $this->render('livro/show.html.twig', [
             'livro' => $livro,
         ]);
     }
 
-    #[Route('/{id}/editar', name: 'livro_editar', methods: ['GET', 'POST'])]
-    public function editar(Request $request, Livro $livro, LivroRepository $livroRepository): Response {
+    #[Route('/{codl}/editar', name: 'livro_editar', methods: ['GET', 'POST'])]
+    public function editar(
+        #[MapEntity(id: 'codl')]
+        Livro $livro,
+        Request $request, 
+        LivroRepository $livroRepository
+    ): Response {
         $form = $this->createForm(LivroType::class, $livro);
 
         $form->handleRequest($request);
@@ -67,8 +76,12 @@ class LivroController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/remover', name: 'livro_remover', methods: ['POST'])]
-    public function remover(Livro $livro, LivroRepository $livroRepository): Response {
+    #[Route('/{codl}/remover', name: 'livro_remover', methods: ['POST'])]
+    public function remover(
+        #[MapEntity(id: 'codl')]
+        Livro $livro, 
+        LivroRepository $livroRepository
+    ): Response {
         $livroRepository->remove($livro);
 
         return $this->redirectToRoute('livro_index');

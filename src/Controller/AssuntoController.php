@@ -57,9 +57,9 @@ class AssuntoController extends AbstractController
 
     #[Route('/{codas}/editar', name: 'assunto_editar', methods: ['GET', 'POST'])]
     public function editar(
-        Request $request,
         #[MapEntity(id: 'codas')]
         Assunto $assunto,
+        Request $request,
         AssuntoRepository $repository
     ): Response {
         $form = $this->createForm(AssuntoType::class, $assunto);
@@ -69,7 +69,7 @@ class AssuntoController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $repository->save($assunto);
-
+            $this->addFlash('success', 'Assunto salvo com sucesso.');
             return $this->redirectToRoute('assunto_index');
         }
 

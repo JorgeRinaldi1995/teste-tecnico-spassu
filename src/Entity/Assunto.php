@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\AssuntoRepository;
 
 #[ORM\Entity(repositoryClass: AssuntoRepository::class)]
@@ -14,10 +15,15 @@ class Assunto
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'codas')]
-    private ?int $codas = null;
+    private int $codas;
 
+    #[Assert\NotBlank(message: 'Descrição do assunto é obrigatória.')]
+    #[Assert\Length(
+        max: 40,
+        maxMessage: 'A descrição deve ter no máximo {{ limit }} caracteres.'
+    )]
     #[ORM\Column(length: 40)]
-    private ?string $descricao = null;
+    private string $descricao;
 
     #[ORM\ManyToMany(
         targetEntity: Livro::class,
@@ -30,12 +36,12 @@ class Assunto
         $this->livros = new ArrayCollection();
     }
 
-        public function getCodas(): ?int
+        public function getCodas(): int
     {
         return $this->codas;
     }
 
-    public function getDescricao(): ?string
+    public function getDescricao(): string
     {
         return $this->descricao;
     }

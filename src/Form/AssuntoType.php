@@ -15,6 +15,7 @@ class AssuntoType extends AbstractType
         $builder
             ->add('descricao', TextType::class, [
                 'label' => 'Descrição',
+                'required' => true,
                 'attr' => [
                     'maxlength' => 40,
                 ],

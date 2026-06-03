@@ -17,58 +17,32 @@ class Livro
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'codl', type: 'integer')]
-    private ?int $codl = null;
+    private int $codl;
 
     #[ORM\Column(length: 40)]
-    private ?string $titulo = null;
+    private string $titulo;
 
     #[ORM\Column(length: 40)]
-    private ?string $editora = null;
+    private string $editora;
 
     #[ORM\Column(type: 'integer')]
-    private ?int $edicao = null;
+    private int $edicao;
 
     #[ORM\Column(name: 'ano_publicacao', length: 4)]
-    private ?string $anoPublicacao = null;
+    private string $anoPublicacao;
 
-    #[ORM\ManyToMany(
-        targetEntity: Autor::class,
-        inversedBy: 'livros'
-    )]
+    #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros')]
     #[ORM\JoinTable(name: 'livro_autor')]
-    #[ORM\JoinColumn(
-        name: 'livro_codl',
-        referencedColumnName: 'codl'
-    )]
-    #[ORM\InverseJoinColumn(
-        name: 'autor_codau',
-        referencedColumnName: 'codau'
-    )]
-    #[Assert\Count(
-        min: 1,
-        minMessage: 'Selecione pelo menos um autor.'
-    )]
-
+    #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
+    #[ORM\InverseJoinColumn(name: 'autor_codau', referencedColumnName: 'codau')]
+    #[Assert\Count(min: 1, minMessage: 'Selecione pelo menos um autor.')]
     private Collection $autores;
 
-    #[ORM\ManyToMany(
-        targetEntity: Assunto::class,
-        inversedBy: 'livros'
-    )]
+    #[ORM\ManyToMany(targetEntity: Assunto::class, inversedBy: 'livros')]
     #[ORM\JoinTable(name: 'livro_assunto')]
-    #[ORM\JoinColumn(
-        name: 'livro_codl',
-        referencedColumnName: 'codl'
-    )]
-    #[ORM\InverseJoinColumn(
-        name: 'assunto_codas',
-        referencedColumnName: 'codas'
-    )]
-    #[Assert\Count(
-        min: 1,
-        minMessage: 'Selecione pelo menos um assunto.'
-    )]
-
+    #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
+    #[ORM\InverseJoinColumn(name: 'assunto_codas', referencedColumnName: 'codas')]
+    #[Assert\Count(min: 1, minMessage: 'Selecione pelo menos um assunto.')]
     private Collection $assuntos;
 
     public function __construct()
@@ -77,12 +51,12 @@ class Livro
         $this->assuntos = new ArrayCollection();
     }
 
-    public function getCodl(): ?int
+    public function getCodl(): int
     {
         return $this->codl;
     }
 
-    public function getTitulo(): ?string
+    public function getTitulo(): string
     {
         return $this->titulo;
     }
@@ -93,7 +67,7 @@ class Livro
         return $this;
     }
 
-    public function getEditora(): ?string
+    public function getEditora(): string
     {
         return $this->editora;
     }
@@ -104,7 +78,7 @@ class Livro
         return $this;
     }
 
-    public function getEdicao(): ?int
+    public function getEdicao(): int
     {
         return $this->edicao;
     }
@@ -115,7 +89,7 @@ class Livro
         return $this;
     }
 
-    public function getAnoPublicacao(): ?string
+    public function getAnoPublicacao(): string
     {
         return $this->anoPublicacao;
     }

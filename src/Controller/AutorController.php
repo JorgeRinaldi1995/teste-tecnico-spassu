@@ -49,8 +49,7 @@ class AutorController extends AbstractController
     public function show(
         #[MapEntity(id: 'codau')]
         Autor $autor
-    ): Response
-    {
+    ): Response {
         return $this->render('autor/show.html.twig', [
             'autor' => $autor,
         ]);
@@ -80,7 +79,7 @@ class AutorController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/remover', name: 'autor_remover', methods: ['POST'])]
+    #[Route('/{codau}/remover', name: 'autor_remover', methods: ['POST'])]
     public function remover(
         #[MapEntity(id: 'codau')] 
         Autor $autor,

@@ -17,10 +17,27 @@ class LivroType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('titulo', TextType::class)
-            ->add('editora', TextType::class)
-            ->add('edicao', IntegerType::class)
+            ->add('titulo', TextType::class, [
+                'label' => 'Titulo',
+                'required' => true,
+                'attr' => [
+                    'maxlength' => 40,
+                ],
+            ])
+            ->add('editora', TextType::class, [
+                'label' => 'Editora',
+                'required' => true,
+                'attr' => [
+                    'maxlength' => 40,
+                ],
+            ])
+            ->add('edicao', IntegerType::class, [
+                'label' => 'Edição',
+                'required' => true,
+            ])
             ->add('anoPublicacao', TextType::class, [
+                'label' => 'Ano Publicação',
+                'required' => true,
                 'attr' => [
                     'maxlength' => 4
                 ]
@@ -28,15 +45,17 @@ class LivroType extends AbstractType
             ->add('autores', EntityType::class, [
                 'class' => Autor::class,
                 'choice_label' => 'nome',
+                'required' => true,
                 'multiple' => true,
-                'expanded' => false,
+                'expanded' => true,
                 'label' => 'Autores',
             ])
             ->add('assuntos', EntityType::class, [
                 'class' => Assunto::class,
                 'choice_label' => 'descricao',
+                'required' => true,
                 'multiple' => true,
-                'expanded' => false,
+                'expanded' => true,
                 'label' => 'Assuntos',
             ]);
     }
