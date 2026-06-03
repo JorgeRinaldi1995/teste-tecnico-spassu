@@ -25,7 +25,7 @@ class AutorController extends AbstractController
     #[Route('/novo', name: 'autor_novo', methods: ['GET', 'POST'])]
     public function novo(
         Request $request,
-        AutorRepository $repository
+        AutorRepository $repository,
     ): Response {
         $autor = new Autor();
 
@@ -35,7 +35,7 @@ class AutorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($autor);
+            $repository->save($autor, true);
 
             return $this->redirectToRoute('autor_index');
         }
@@ -68,7 +68,7 @@ class AutorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($autor);
+            $repository->save($autor, true);
             $this->addFlash('success', 'Autor salvo com sucesso.');
             return $this->redirectToRoute('autor_index');
         }
@@ -85,8 +85,12 @@ class AutorController extends AbstractController
         Autor $autor,
         AutorRepository $repository
     ): Response {
-        $repository->remove($autor);
-
+        if (!$autor->getLivros()->isEmpty()) {
+            $this->addFlash('danger', 'Não é possível remover um autor vinculado a livros.');
+            return $this->redirectToRoute('autor_index');
+        }
+        $repository->remove($autor, true);
+        $this->addFlash('success', 'Autor removido com sucesso.');
         return $this->redirectToRoute('autor_index');
     }
 }

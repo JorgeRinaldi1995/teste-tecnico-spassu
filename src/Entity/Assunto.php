@@ -25,10 +25,7 @@ class Assunto
     #[ORM\Column(length: 40)]
     private string $descricao;
 
-    #[ORM\ManyToMany(
-        targetEntity: Livro::class,
-        mappedBy: 'assuntos'
-    )]
+    #[ORM\ManyToMany(targetEntity: Livro::class, mappedBy: 'assuntos')]
     private Collection $livros;
 
     public function __construct()

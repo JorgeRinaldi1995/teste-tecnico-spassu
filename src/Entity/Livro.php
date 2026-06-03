@@ -31,14 +31,14 @@ class Livro
     #[ORM\Column(name: 'ano_publicacao', length: 4)]
     private string $anoPublicacao;
 
-    #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros')]
+    #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'livro_autor')]
     #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
     #[ORM\InverseJoinColumn(name: 'autor_codau', referencedColumnName: 'codau')]
     #[Assert\Count(min: 1, minMessage: 'Selecione pelo menos um autor.')]
     private Collection $autores;
 
-    #[ORM\ManyToMany(targetEntity: Assunto::class, inversedBy: 'livros')]
+    #[ORM\ManyToMany(targetEntity: Assunto::class, inversedBy: 'livros', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'livro_assunto')]
     #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
     #[ORM\InverseJoinColumn(name: 'assunto_codas', referencedColumnName: 'codas')]

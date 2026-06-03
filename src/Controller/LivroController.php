@@ -17,7 +17,7 @@ class LivroController extends AbstractController
     public function index(LivroRepository $livroRepository): Response
     {
         return $this->render('livro/index.html.twig', [
-            'livros' => $livroRepository->findAll(),
+            'livros' => $livroRepository->findAllWithRelations(),
         ]);
     }
 
@@ -31,7 +31,7 @@ class LivroController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $livroRepository->save($livro);
+            $livroRepository->save($livro, true);
 
             return $this->redirectToRoute('livro_index');
         }
@@ -43,10 +43,17 @@ class LivroController extends AbstractController
 
     #[Route('/{codl}', name: 'livro_show', methods: ['GET'])]
     public function show(
-        #[MapEntity(id: 'codl')] 
-        Livro $livro
+        #[MapEntity(id: 'codl')]
+        int $codl,
+        LivroRepository $livroRepository
     ): Response
     {
+        $livro = $livroRepository->findWithRelations($codl);
+
+        if (!$livro) {
+            throw $this->createNotFoundException('Livro não encontrado.');
+        }
+
         return $this->render('livro/show.html.twig', [
             'livro' => $livro,
         ]);
@@ -65,7 +72,7 @@ class LivroController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $livroRepository->save($livro);
+            $livroRepository->save($livro, true);
 
             return $this->redirectToRoute('livro_index');
         }
@@ -82,7 +89,7 @@ class LivroController extends AbstractController
         Livro $livro, 
         LivroRepository $livroRepository
     ): Response {
-        $livroRepository->remove($livro);
+        $livroRepository->remove($livro, true);
 
         return $this->redirectToRoute('livro_index');
     }

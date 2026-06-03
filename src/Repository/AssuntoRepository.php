@@ -13,7 +13,30 @@ class AssuntoRepository extends ServiceEntityRepository
         parent::__construct($registry, Assunto::class);
     }
 
-    public function save(Assunto $assunto, bool $flush = true): void
+    public function findWithLivros(int $id): ?Assunto
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.livros', 'l')
+            ->leftJoin('l.autores', 'a')
+            ->addSelect('l', 'a')
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findAssuntosAtivos(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.livros', 'l')
+            ->addSelect('l')
+            ->groupBy('s.id')
+            ->orderBy('s.descricao', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function save(Assunto $assunto, bool $flush = false): void
     {
         $this->getEntityManager()->persist($assunto);
 
@@ -22,7 +45,7 @@ class AssuntoRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Assunto $assunto, bool $flush = true): void
+    public function remove(Assunto $assunto, bool $flush = false): void
     {
         $this->getEntityManager()->remove($assunto);
 

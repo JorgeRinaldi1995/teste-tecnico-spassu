@@ -35,7 +35,7 @@ class AssuntoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($assunto);
+            $repository->save($assunto, true);
 
             return $this->redirectToRoute('assunto_index');
         }
@@ -68,7 +68,7 @@ class AssuntoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($assunto);
+            $repository->save($assunto, true);
             $this->addFlash('success', 'Assunto salvo com sucesso.');
             return $this->redirectToRoute('assunto_index');
         }
@@ -85,7 +85,7 @@ class AssuntoController extends AbstractController
         Assunto $assunto,
         AssuntoRepository $repository
     ): Response {
-        $repository->remove($assunto);
+        $repository->remove($assunto, true);
 
         return $this->redirectToRoute('assunto_index');
     }

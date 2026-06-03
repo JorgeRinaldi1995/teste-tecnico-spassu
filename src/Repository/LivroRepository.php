@@ -13,8 +13,59 @@ class LivroRepository extends ServiceEntityRepository
         parent::__construct($registry, Livro::class);
     }
 
-    public function save(Livro $livro, bool $flush = true): void 
+    public function findWithRelations(int $codl): ?livro
     {
+        return $this->createQueryBuilder('l')
+            ->leftJoin('l.autores', 'a')
+            ->leftJoin('l.assuntos', 's')
+            ->addSelect('a', 's')
+            ->where('l.codl = :codl')
+            ->setParameter('codl', $codl)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findAllWithRelations(): array
+    {
+        return $this->createQueryBuilder('l')
+            ->leftJoin('l.autores', 'a')
+            ->leftJoin('l.assuntos', 's')
+            ->addSelect('a', 's')
+            ->orderBy('l.titulo', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByAutor(int $codau): array
+    {
+        return $this->createQueryBuilder('l')
+            ->innerJoin('l.autores', 'a')
+            ->addSelect('a')
+            ->where('a.id = :codau')
+            ->setParameter('codau', $codau)
+            ->orderBy('l.titulo', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByAssunto(int $codas): array
+    {
+        return $this->createQueryBuilder('l')
+            ->innerJoin('l.assuntos', 's')
+            ->addSelect('s')
+            ->where('s.id = :codas')
+            ->setParameter('codas', $codas)
+            ->orderBy('l.titulo', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function save(Livro $livro, bool $flush = false): void
+    {
+        if ($livro->getAutores()->isEmpty()) {
+            throw new \DomainException('Um livro deve ter ao menos um autor.');
+        }
+
         $this->getEntityManager()->persist($livro);
 
         if ($flush) {
@@ -22,7 +73,7 @@ class LivroRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Livro $livro, bool $flush = true): void
+    public function remove(Livro $livro, bool $flush = false): void
     {
         $this->getEntityManager()->remove($livro);
 
@@ -31,8 +82,4 @@ class LivroRepository extends ServiceEntityRepository
         }
     }
 
-    public function getAutores(): Collection
-    {
-        return $this->autores;
-    }
 }
