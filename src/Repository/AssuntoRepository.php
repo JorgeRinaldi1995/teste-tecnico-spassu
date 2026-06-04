@@ -27,7 +27,7 @@ class AssuntoRepository extends ServiceEntityRepository
      * @throws \RuntimeException em falha de infraestrutura
      * @throws \InvalidArgumentException se $codl for inválido
      */
-    public function findWithLivros(int $codas): ?Assunto
+    public function findById(int $codas): ?Assunto
     {
         if ($codas <= 0) {
             throw new \InvalidArgumentException(

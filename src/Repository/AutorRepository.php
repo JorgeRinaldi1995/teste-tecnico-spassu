@@ -27,7 +27,7 @@ class AutorRepository extends ServiceEntityRepository
      * @throws \RuntimeException em falha de infraestrutura
      * @throws \InvalidArgumentException se $codau for inválido
      */
-    public function findWithLivros(int $codau): ?Autor
+    public function findById(int $codau): ?Autor
     {
         if ($codau <= 0) {
             throw new \InvalidArgumentException(

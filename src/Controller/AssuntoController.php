@@ -14,11 +14,17 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 #[Route('/assunto')]
 class AssuntoController extends AbstractController
 {
+    public function __construct(
+        private readonly AssuntoRepository $repository
+    ){
+
+    }
+
     #[Route('/', name: 'assunto_index', methods: ['GET'])]
     public function index(AssuntoRepository $repository): Response
     {
         return $this->render('assunto/index.html.twig', [
-            'assuntos' => $repository->findAll(),
+            'assuntos' => $this->repository->findAssuntosAtivos(),
         ]);
     }
 
@@ -35,7 +41,7 @@ class AssuntoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($assunto, true);
+            $this->repository->save($assunto, true);
 
             return $this->redirectToRoute('assunto_index');
         }
@@ -48,8 +54,15 @@ class AssuntoController extends AbstractController
     #[Route('/{codas}', name: 'assunto_show', methods: ['GET'])]
     public function show(
         #[MapEntity(id: 'codas')]
+        int $codas,
         Assunto $assunto
     ): Response {
+        $assunto = $this->repository->findById($codas);
+        if (!$assunto){
+            throw $this->createNotFoundException(
+                'Assunto não encontrado.'
+            );
+        }
         return $this->render('assunto/show.html.twig', [
             'assunto' => $assunto,
         ]);

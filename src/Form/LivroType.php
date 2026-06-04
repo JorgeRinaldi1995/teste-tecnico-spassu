@@ -8,6 +8,7 @@ use App\Entity\Assunto;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -41,6 +42,12 @@ class LivroType extends AbstractType
                 'attr' => [
                     'maxlength' => 4
                 ]
+            ])
+            ->add('valor', MoneyType::class, [
+                'label' => 'Preço',
+                'currency' => 'BRL',
+                'required' => true,
+                'scale' => 2,
             ])
             ->add('autores', EntityType::class, [
                 'class' => Autor::class,

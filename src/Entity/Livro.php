@@ -31,6 +31,9 @@ class Livro
     #[ORM\Column(name: 'ano_publicacao', length: 4)]
     private string $anoPublicacao;
 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    private string $valor;
+
     #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'livro_autor')]
     #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
@@ -97,6 +100,17 @@ class Livro
     public function setAnoPublicacao(string $anoPublicacao): self
     {
         $this->anoPublicacao = $anoPublicacao;
+        return $this;
+    }
+
+        public function getValor(): string
+    {
+        return $this->valor;
+    }
+
+    public function setValor(string $valor): self
+    {
+        $this->valor = $valor;
         return $this;
     }
 
