@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Assunto;
 use App\Form\AssuntoType;
 use App\Repository\AssuntoRepository;
+use App\Service\AssuntoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 class AssuntoController extends AbstractController
 {
     public function __construct(
-        private readonly AssuntoRepository $repository
+        private readonly AssuntoService $service
     ){
 
     }
@@ -24,7 +25,7 @@ class AssuntoController extends AbstractController
     public function index(AssuntoRepository $repository): Response
     {
         return $this->render('assunto/index.html.twig', [
-            'assuntos' => $this->repository->findAssuntosAtivos(),
+            'assuntos' => $this->service->listarAtivos()
         ]);
     }
 
@@ -41,7 +42,7 @@ class AssuntoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $this->repository->save($assunto, true);
+            $this->service->criar($assunto);
 
             return $this->redirectToRoute('assunto_index');
         }
@@ -52,17 +53,16 @@ class AssuntoController extends AbstractController
     }
 
     #[Route('/{codas}', name: 'assunto_show', methods: ['GET'])]
-    public function show(
-        #[MapEntity(id: 'codas')]
-        int $codas,
-        Assunto $assunto
-    ): Response {
-        $assunto = $this->repository->findById($codas);
-        if (!$assunto){
+    public function show(int $codas): Response
+    {
+        $assunto = $this->service->buscarPorCodigo($codas);
+
+        if (!$assunto) {
             throw $this->createNotFoundException(
                 'Assunto não encontrado.'
             );
         }
+
         return $this->render('assunto/show.html.twig', [
             'assunto' => $assunto,
         ]);
@@ -81,7 +81,7 @@ class AssuntoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository->save($assunto, true);
+            $this->service->atualizar($assunto);
             $this->addFlash('success', 'Assunto salvo com sucesso.');
             return $this->redirectToRoute('assunto_index');
         }
@@ -98,7 +98,7 @@ class AssuntoController extends AbstractController
         Assunto $assunto,
         AssuntoRepository $repository
     ): Response {
-        $repository->remove($assunto, true);
+        $this->service->remover($assunto);
 
         return $this->redirectToRoute('assunto_index');
     }
