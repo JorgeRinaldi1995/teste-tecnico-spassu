@@ -1,33 +1,52 @@
-{# _form.html.twig #}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            {{ form_start(form, {
+                attr: {
+                    class: 'p-4 border rounded bg-light shadow-sm'
+                }
+            }) }}
 
-{{ form_start(form) }}
+            <div class="col justify-content-center" >
+                <div class="col">
+                    {{ form_row(form.titulo) }}
+                </div>
 
-{{ form_row(form.titulo) }}
-{{ form_row(form.editora) }}
-{{ form_row(form.edicao) }}
-{{ form_row(form.anoPublicacao) }}
-{{ form_row(form.valor) }}
+                <div class="col">
+                    {{ form_row(form.editora) }}
+                </div>
 
-<div class="mb-3">
-    {{ form_label(form.autores) }}
-    {{ form_widget(form.autores, {
-        attr: {
-            class: 'form-select'
-        }
-    }) }}
+                <div class="col">
+                    {{ form_row(form.edicao) }}
+                </div>
+
+                <div class="col">
+                    {{ form_row(form.anoPublicacao) }}
+                </div>
+
+                <div class="col">
+                    {{ form_row(form.valor) }}
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="col">
+                    {{ form_row(form.autores) }}
+                </div>
+
+                <div class="col">
+                    {{ form_row(form.assuntos) }}
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-success">
+                    {{ button_label|default('Salvar') }}
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+
+        </div>
+    </div>
 </div>
-
-<div class="mb-3">
-    {{ form_label(form.assuntos) }}
-    {{ form_widget(form.assuntos, {
-        attr: {
-            class: 'form-select'
-        }
-    }) }}
-</div>
-
-<button class="btn btn-success">
-    {{ button_label|default('Salvar') }}
-</button>
-
-{{ form_end(form) }}

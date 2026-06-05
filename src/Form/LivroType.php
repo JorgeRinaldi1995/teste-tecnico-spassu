@@ -40,8 +40,12 @@ class LivroType extends AbstractType
                 'label' => 'Ano Publicação',
                 'required' => true,
                 'attr' => [
-                    'maxlength' => 4
-                ]
+                    'maxlength'   => 4,
+                    'pattern'     => '\d{4}',
+                    'inputmode'   => 'numeric',
+                    'placeholder' => 'Ex: 2024',
+                    'title'       => 'Informe o ano com 4 dígitos numéricos',
+                ],
             ])
             ->add('valor', MoneyType::class, [
                 'label' => 'Preço',

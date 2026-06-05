@@ -20,18 +20,45 @@ class Livro
     private int $codl;
 
     #[ORM\Column(length: 40)]
+    #[Assert\NotBlank(message: 'O título é obrigatório.')]
+    #[Assert\Length(
+        max: 40,
+        maxMessage: 'O título não pode ter mais de {{ limit }} caracteres.'
+    )]
     private string $titulo;
 
     #[ORM\Column(length: 40)]
+    #[Assert\NotBlank(message: 'A editora é obrigatória.')]
+    #[Assert\Length(
+        max: 40,
+        maxMessage: 'A editora não pode ter mais de {{ limit }} caracteres.'
+    )]
     private string $editora;
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: 'A edição é obrigatória.')]
+    #[Assert\Positive(message: 'A edição deve ser um número positivo.')]
     private int $edicao;
 
     #[ORM\Column(name: 'ano_publicacao', length: 4)]
+    #[Assert\NotBlank(message: 'O ano de publicação é obrigatório.')]
+    #[Assert\Length(
+        exactly: 4,
+        exactMessage: 'O ano de publicação deve ter exatamente {{ limit }} dígitos.'
+    )]
+    #[Assert\Regex(
+        pattern: '/^\d{4}$/',
+        message: 'O ano de publicação deve conter apenas dígitos numéricos.'
+    )]
     private string $anoPublicacao;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Assert\NotBlank(message: 'O preço é obrigatório.')]
+    #[Assert\PositiveOrZero(message: 'O preço não pode ser negativo.')]
+    #[Assert\Type(
+        type: 'numeric',
+        message: 'O preço deve ser um valor numérico.'
+    )]
     private string $valor;
 
     #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros', cascade: ['persist'])]
