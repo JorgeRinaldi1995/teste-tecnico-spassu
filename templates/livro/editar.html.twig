@@ -1,16 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Livro{% endblock %}
-
 {% block body %}
 
-<h1 class="mb-4">
-    Editar Livro
-</h1>
+    {{ include('partials/_crud_header.html.twig', {
+        title: 'Editar Livro',
+        back_route: 'livro_index'
+    }) }}
 
-{% include 'livro/_form.html.twig' with {
-    form: form,
-    button_label: 'Atualizar'
-} %}
+    {{ include('livro/_form.html.twig', {
+        form: form,
+        button_label: 'Atualizar'
+    }) }}
 
 {% endblock %}

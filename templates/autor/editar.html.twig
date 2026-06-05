@@ -2,11 +2,14 @@
 
 {% block body %}
 
-<h1>Editar Autor</h1>
+    {{ include('partials/_crud_header.html.twig', {
+        title: 'Editar Autor',
+        back_route: 'autor_index'
+    }) }}
 
-{% include 'autor/_form.html.twig' with {
-    form: form,
-    button_label: 'Atualizar'
-} %}
+    {{ include('autor/_form.html.twig', {
+        form: form,
+        button_label: 'Atualizar'
+    }) }}
 
 {% endblock %}

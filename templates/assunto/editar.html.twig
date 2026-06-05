@@ -2,11 +2,14 @@
 
 {% block body %}
 
-<h1>Editar Assunto</h1>
+    {{ include('partials/_crud_header.html.twig', {
+        title: 'Editar Assunto',
+        back_route: 'assunto_index'
+    }) }}
 
-{% include 'assunto/_form.html.twig' with {
-    form: form,
-    button_label: 'Atualizar'
-} %}
+    {{ include('assunto/_form.html.twig', {
+        form: form,
+        button_label: 'Atualizar'
+    }) }}
 
 {% endblock %}
