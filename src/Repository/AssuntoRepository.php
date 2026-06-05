@@ -61,6 +61,36 @@ class AssuntoRepository extends ServiceEntityRepository
      *
      * @throws \RuntimeException em falha de infraestrutura
      */
+    public function findAllAssuntos(    
+        int $limit = 20,
+        int $offset = 0
+    ): array {
+        try {
+            return $this->createQueryBuilder('s')
+                ->leftJoin('s.livros', 'l')
+                ->addSelect('l')
+                ->orderBy('s.descricao', 'ASC')
+                ->setMaxResults($limit)
+                ->setFirstResult($offset)
+                ->getQuery()
+                ->getResult();
+        
+        } catch (ORMException $e) {
+            $this->logger->error('Erro ORM ao listar livros com relações.', [
+                'exception' => $e->getMessage(),
+            ]);
+
+            throw new \RuntimeException('Erro ao listar os assuntos. Tente novamente mais tarde.', 0, $e);
+        }
+    }
+
+    /**
+     * Retorna todos os assuntos relacionados a livros, ordenados por descricao.
+     *
+     * @return Assunto[]
+     *
+     * @throws \RuntimeException em falha de infraestrutura
+     */
     public function findAssuntosAtivos(): array
     {
         try {

@@ -70,14 +70,18 @@ class LivroRepository extends ServiceEntityRepository
      *
      * @throws \RuntimeException em falha de infraestrutura
      */
-    public function findAllWithRelations(): array
-    {
+    public function findAllWithRelations(
+        $limit = 20,
+        $offset = 0
+    ): array {
         try {
             return $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
                 ->leftJoin('l.assuntos', 's')
                 ->addSelect('a', 's')
                 ->orderBy('l.titulo', 'ASC')
+                ->setMaxResults($limit)
+                ->setFirstResult($offset)
                 ->getQuery()
                 ->getResult();
 

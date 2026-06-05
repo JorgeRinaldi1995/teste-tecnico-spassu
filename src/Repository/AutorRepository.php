@@ -63,6 +63,36 @@ class AutorRepository extends ServiceEntityRepository
     }
 
     /**
+     * Retorna todos os assuntos relacionados a livros, ordenados por descricao.
+     *
+     * @return Autor[]
+     *
+     * @throws \RuntimeException em falha de infraestrutura
+     */
+    public function findAllAtores(    
+        int $limit = 20,
+        int $offset = 0
+    ): array {
+        try {
+            return $this->createQueryBuilder('a')
+                ->leftJoin('a.livros', 'l')
+                ->addSelect('l')
+                ->orderBy('a.nome', 'ASC')
+                ->setMaxResults($limit)
+                ->setFirstResult($offset)
+                ->getQuery()
+                ->getResult();
+        
+        } catch (ORMException $e) {
+            $this->logger->error('Erro ORM ao listar livros com relações.', [
+                'exception' => $e->getMessage(),
+            ]);
+
+            throw new \RuntimeException('Erro ao listar os assuntos. Tente novamente mais tarde.', 0, $e);
+        }
+    }
+
+    /**
      * Persiste um Autor no EntityManager e, opcionalmente, executa o flush.
      *
      * A validação de regra de negócio (ex.: "autor deve pertencer a livro") deve ser

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Autor;
 use App\Form\AutorType;
-use App\Repository\AutorRepository;
 use App\Service\AutorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,8 +18,9 @@ class AutorController extends AbstractController
         private readonly AutorService $autorService
     ) {
     }
+
     #[Route('/', name: 'autor_index', methods: ['GET'])]
-    public function index(AutorRepository $repository): Response
+    public function index(): Response
     {
         return $this->render('autor/index.html.twig', [
             'autores' => $this->autorService->listarTodos(),
@@ -28,10 +28,7 @@ class AutorController extends AbstractController
     }
 
     #[Route('/novo', name: 'autor_novo', methods: ['GET', 'POST'])]
-    public function novo(
-        Request $request,
-        AutorRepository $repository,
-    ): Response {
+    public function novo(Request $request): Response {
         $autor = new Autor();
 
         $form = $this->createForm(AutorType::class, $autor);
@@ -50,9 +47,8 @@ class AutorController extends AbstractController
         ]);
     }
 
-    #[Route('/{codau}', name: 'autor_show', methods: ['GET'])]
-    public function show(int $codau): Response
-    {
+    #[Route('/{codau}', name: 'autor_show', methods: ['GET'], requirements: ['codl' => '\d+'])]
+    public function show(int $codau): Response {
         $autor = $this->autorService->buscarPorCodigo($codau);
 
         if (!$autor) {
@@ -66,12 +62,10 @@ class AutorController extends AbstractController
         ]);
     }
 
-    #[Route('/{codau}/editar', name: 'autor_editar', methods: ['GET', 'POST'])]
+    #[Route('/{codau}/editar', name: 'autor_editar', methods: ['GET', 'POST'], requirements: ['codl' => '\d+'])]
     public function editar(
-        #[MapEntity(id: 'codau')] 
-        Autor $autor,
+        #[MapEntity(id: 'codau')] Autor $autor,
         Request $request,
-        AutorRepository $repository
     ): Response {
         $form = $this->createForm(AutorType::class, $autor);
 
@@ -80,11 +74,6 @@ class AutorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $this->autorService->atualizar($autor);
-
-            $this->addFlash(
-                'success',
-                'Autor salvo com sucesso.'
-            );
 
             return $this->redirectToRoute('autor_index');
         }
@@ -95,28 +84,11 @@ class AutorController extends AbstractController
         ]);
     }
 
-    #[Route('/{codau}/remover', name: 'autor_remover', methods: ['POST'])]
+    #[Route('/{codau}/remover', name: 'autor_remover', methods: ['POST'], requirements: ['codl' => '\d+'])]
     public function remover(
-        #[MapEntity(id: 'codau')] 
-        Autor $autor,
-        AutorRepository $repository
+        #[MapEntity(id: 'codau')] Autor $autor,
     ): Response {
-        try {
-
-            $this->autorService->remover($autor);
-
-            $this->addFlash(
-                'success',
-                'Autor removido com sucesso.'
-            );
-
-        } catch (\DomainException $e) {
-
-            $this->addFlash(
-                'danger',
-                $e->getMessage()
-            );
-        }
+        $this->autorService->remover($autor);
 
         return $this->redirectToRoute('autor_index');
     }

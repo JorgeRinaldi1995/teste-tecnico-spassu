@@ -15,9 +15,9 @@ class AssuntoService
     /**
      * @return Assunto[]
      */
-    public function listarAtivos(): array
+    public function listarAssuntos(): array
     {
-        return $this->repository->findAssuntosAtivos();
+        return $this->repository->findAllAssuntos();
     }
 
     public function buscarPorCodigo(int $codas): ?Assunto

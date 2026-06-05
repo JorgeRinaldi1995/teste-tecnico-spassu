@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Assunto;
 use App\Form\AssuntoType;
-use App\Repository\AssuntoRepository;
 use App\Service\AssuntoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,23 +16,18 @@ class AssuntoController extends AbstractController
 {
     public function __construct(
         private readonly AssuntoService $service
-    ){
-
-    }
+    ){}
 
     #[Route('/', name: 'assunto_index', methods: ['GET'])]
-    public function index(AssuntoRepository $repository): Response
+    public function index(): Response
     {
         return $this->render('assunto/index.html.twig', [
-            'assuntos' => $this->service->listarAtivos()
+            'assuntos' => $this->service->listarAssuntos()
         ]);
     }
 
     #[Route('/novo', name: 'assunto_novo', methods: ['GET', 'POST'])]
-    public function novo(
-        Request $request,
-        AssuntoRepository $repository
-    ): Response {
+    public function novo(Request $request): Response {
         $assunto = new Assunto();
 
         $form = $this->createForm(AssuntoType::class, $assunto);
@@ -52,9 +46,8 @@ class AssuntoController extends AbstractController
         ]);
     }
 
-    #[Route('/{codas}', name: 'assunto_show', methods: ['GET'])]
-    public function show(int $codas): Response
-    {
+    #[Route('/{codas}', name: 'assunto_show', methods: ['GET'], requirements: ['codl' => '\d+'])]
+    public function show(int $codas): Response {
         $assunto = $this->service->buscarPorCodigo($codas);
 
         if (!$assunto) {
@@ -68,12 +61,10 @@ class AssuntoController extends AbstractController
         ]);
     }
 
-    #[Route('/{codas}/editar', name: 'assunto_editar', methods: ['GET', 'POST'])]
+    #[Route('/{codas}/editar', name: 'assunto_editar', methods: ['GET', 'POST'], requirements: ['codl' => '\d+'])]
     public function editar(
-        #[MapEntity(id: 'codas')]
-        Assunto $assunto,
+        #[MapEntity(id: 'codas')] Assunto $assunto,
         Request $request,
-        AssuntoRepository $repository
     ): Response {
         $form = $this->createForm(AssuntoType::class, $assunto);
 
@@ -82,7 +73,7 @@ class AssuntoController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $this->service->atualizar($assunto);
-            $this->addFlash('success', 'Assunto salvo com sucesso.');
+
             return $this->redirectToRoute('assunto_index');
         }
 
@@ -92,11 +83,9 @@ class AssuntoController extends AbstractController
         ]);
     }
 
-    #[Route('/{codas}/remover', name: 'assunto_remover', methods: ['POST'])]
+    #[Route('/{codas}/remover', name: 'assunto_remover', methods: ['POST'], requirements: ['codl' => '\d+'])]
     public function remover(
-        #[MapEntity(id: 'codas')]
-        Assunto $assunto,
-        AssuntoRepository $repository
+        #[MapEntity(id: 'codas')] Assunto $assunto,
     ): Response {
         $this->service->remover($assunto);
 

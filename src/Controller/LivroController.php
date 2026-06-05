@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Livro;
-use App\Repository\LivroRepository;
 use App\Form\LivroType;
 use App\Service\LivroService;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,32 +13,29 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 class LivroController extends AbstractController
 {
+    public function __construct(
+        private readonly LivroService $livroService
+    ) {}
+
     #[Route('/', name: 'livro_index', methods: ['GET'])]
-    public function index(
-        LivroService $livroService
-    ): Response {
+    public function index(): Response
+    {
         return $this->render('livro/index.html.twig', [
-            'livros' => $livroService->listarTodos(),
+            'livros' => $this->livroService->listarTodos(),
         ]);
     }
 
     #[Route('/novo', name: 'livro_novo', methods: ['GET', 'POST'])]
-    public function novo(
-        Request $request,
-        LivroService $livroService
-    ): Response {
+    public function novo(Request $request): Response {
         $livro = new Livro();
 
-        $form = $this->createForm(
-            LivroType::class,
-            $livro
-        );
+        $form = $this->createForm(LivroType::class, $livro);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $livroService->criar($livro);
+            $this->livroService->criar($livro);
 
             return $this->redirectToRoute('livro_index');
         }
@@ -49,12 +45,9 @@ class LivroController extends AbstractController
         ]);
     }
 
-    #[Route('/{codl}', name: 'livro_show', methods: ['GET'])]
-    public function show(
-        int $codl,
-        LivroService $livroService
-    ): Response {
-        $livro = $livroService->buscarPorCodigo($codl);
+    #[Route('/{codl}', name: 'livro_show', methods: ['GET'], requirements: ['codl' => '\d+'])]
+    public function show(int $codl): Response {
+        $livro = $this->livroService->buscarPorCodigo($codl);
 
         if (!$livro) {
             throw $this->createNotFoundException(
@@ -67,23 +60,18 @@ class LivroController extends AbstractController
         ]);
     }
 
-    #[Route('/{codl}/editar', name: 'livro_editar')]
+    #[Route('/{codl}/editar', name: 'livro_editar', methods: ['GET', 'POST'], requirements: ['codl' => '\d+'])]
     public function editar(
-        #[MapEntity(id: 'codl')]
-        Livro $livro,
+        #[MapEntity(id: 'codl')] Livro $livro,
         Request $request,
-        LivroService $livroService
     ): Response {
-        $form = $this->createForm(
-            LivroType::class,
-            $livro
-        );
+        $form = $this->createForm(LivroType::class, $livro);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $livroService->atualizar($livro);
+            $this->livroService->atualizar($livro);
 
             return $this->redirectToRoute('livro_index');
         }
@@ -94,13 +82,11 @@ class LivroController extends AbstractController
         ]);
     }
 
-    #[Route('/{codl}/remover', name: 'livro_remover', methods: ['POST'])]
+    #[Route('/{codl}/remover', name: 'livro_remover', methods: ['POST'], requirements: ['codl' => '\d+'])]
     public function remover(
-        #[MapEntity(id: 'codl')]
-        Livro $livro,
-        LivroService $livroService
+        #[MapEntity(id: 'codl')] Livro $livro,
     ): Response {
-        $livroService->remover($livro);
+        $this->livroService->remover($livro);
 
         return $this->redirectToRoute('livro_index');
     }
