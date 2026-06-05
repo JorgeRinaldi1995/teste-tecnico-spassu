@@ -2,64 +2,59 @@
 
 {% block body %}
 
-<div class="d-flex justify-content-between mb-3">
+    {{ include('partials/_crud_header.html.twig', {
+        title: 'Assuntos',
+        new_route: 'assunto_novo',
+        new_label: 'Novo Assunto'
+    }) }}
 
-    <h1>Assuntos</h1>
+    {% embed 'partials/_table_layout.html.twig' %}
 
-    <a href="{{ path('assunto_novo') }}"
-       class="btn btn-primary">
-        Novo Assunto
-    </a>
-
-</div>
-
-<table class="table table-striped">
-
-    <thead>
-        <tr>
+        {% block table_header %}
             <th>Código</th>
             <th>Descrição</th>
             <th>Livros</th>
             <th>Ações</th>
-        </tr>
-    </thead>
+        {% endblock %}
 
-    <tbody>
+        {% block table_body %}
 
-    {% for assunto in assuntos %}
-        <tr>
+            {% for assunto in assuntos %}
 
-            <td>{{ assunto.codas }}</td>
+                <tr>
 
-            <td>{{ assunto.descricao }}</td>
+                    <td>{{ assunto.codas }}</td>
 
-            <td>{{ assunto.livros|length }}</td>
+                    <td>{{ assunto.descricao }}</td>
 
-            <td>
+                    <td>{{ assunto.livros|length }}</td>
 
-                <a href="{{ path('assunto_show', {'codas': assunto.codas}) }}"
-                   class="btn btn-info btn-sm">
-                    Ver
-                </a>
+                    <td>
 
-                <a href="{{ path('assunto_editar', {'codas': assunto.codas}) }}"
-                   class="btn btn-warning btn-sm">
-                    Editar
-                </a>
+                        {{ include('partials/_table_actions.html.twig', {
+                            show_route: 'assunto_show',
+                            edit_route: 'assunto_editar',
+                            route_params: {
+                                codas: assunto.codas
+                            }
+                        }) }}
 
-            </td>
+                    </td>
 
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="4">
-                Nenhum assunto encontrado.
-            </td>
-        </tr>
-    {% endfor %}
+                </tr>
 
-    </tbody>
+            {% else %}
 
-</table>
+                <tr>
+                    <td colspan="4">
+                        Nenhum assunto encontrado.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+        {% endblock %}
+
+    {% endembed %}
 
 {% endblock %}

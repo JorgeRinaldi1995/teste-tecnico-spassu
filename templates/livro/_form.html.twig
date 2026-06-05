@@ -1,52 +1,21 @@
-<div class="container min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="row w-100 justify-content-center">
-        <div class="col-12 col-md-8 col-lg-5">
-            {{ form_start(form, {
-                attr: {
-                    class: 'p-4 border rounded bg-light shadow-sm'
-                }
-            }) }}
+{% extends 'partials/_form_layout.html.twig' %}
 
-            <div class="col justify-content-center" >
-                <div class="col">
-                    {{ form_row(form.titulo) }}
-                </div>
+{% set back_route = 'livro_index' %}
 
-                <div class="col">
-                    {{ form_row(form.editora) }}
-                </div>
+{% block form_fields %}
 
-                <div class="col">
-                    {{ form_row(form.edicao) }}
-                </div>
+    {{ form_row(form.titulo) }}
 
-                <div class="col">
-                    {{ form_row(form.anoPublicacao) }}
-                </div>
+    {{ form_row(form.editora) }}
 
-                <div class="col">
-                    {{ form_row(form.valor) }}
-                </div>
-            </div>
+    {{ form_row(form.edicao) }}
 
-            <div class="col">
-                <div class="col">
-                    {{ form_row(form.autores) }}
-                </div>
+    {{ form_row(form.anoPublicacao) }}
 
-                <div class="col">
-                    {{ form_row(form.assuntos) }}
-                </div>
-            </div>
+    {{ form_row(form.valor) }}
 
-            <div class="mt-3">
-                <button class="btn btn-success">
-                    {{ button_label|default('Salvar') }}
-                </button>
-            </div>
+    {{ form_row(form.autores) }}
 
-            {{ form_end(form) }}
+    {{ form_row(form.assuntos) }}
 
-        </div>
-    </div>
-</div>
+{% endblock %}

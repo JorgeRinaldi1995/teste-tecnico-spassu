@@ -6,72 +6,73 @@
    - limiteAtual       (int)
    - limitesPermitidos (int[])
 #}
+<div class="d-flex justify-content-center align-items-center gap-3 mb-2 flex-wrap">
+    {% if limitesPermitidos is defined %}
 
-{% if limitesPermitidos is defined %}
-<div class="d-flex justify-content-end align-items-center mb-2">
-    <label for="selectLimite" class="me-2 mb-0 text-muted small">Itens por página:</label>
-    <select id="selectLimite" class="form-select form-select-sm w-auto">
-        {% for opcao in limitesPermitidos %}
-            <option
-                value="{{ path(rota, params|merge({'pagina': 1, 'limite': opcao})) }}"
-                {{ opcao == limiteAtual ? 'selected' }}
-            >
-                {{ opcao }}
-            </option>
-        {% endfor %}
-    </select>
+        <div class="d-flex align-items-center">
+            <label for="selectLimite" class="me-2 mb-0 text-muted small text-nowrap">Itens por página:</label>
+            <select id="selectLimite" class="form-select form-select-sm w-auto">
+                {% for opcao in limitesPermitidos %}
+                    <option
+                        value="{{ path(rota, params|merge({'pagina': 1, 'limite': opcao})) }}"
+                        {{ opcao == limiteAtual ? 'selected' }}
+                    >
+                        {{ opcao }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    {% endif %}
+
+    {% if totalPaginas > 1 %}
+        <nav aria-label="Paginação">
+            <ul class="pagination pagination-sm mb-0">
+
+                <li class="page-item {{ paginaAtual == 1 ? 'disabled' }}">
+                    <a class="page-link" href="{{ path(rota, params|merge({'pagina': paginaAtual - 1, 'limite': limiteAtual})) }}">
+                        &laquo; Anterior
+                    </a>
+                </li>
+
+                {% set inicio = max(1, paginaAtual - 2) %}
+                {% set fim    = min(totalPaginas, paginaAtual + 2) %}
+
+                {% if inicio > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(rota, params|merge({'pagina': 1, 'limite': limiteAtual})) }}">1</a>
+                    </li>
+                    {% if inicio > 2 %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endif %}
+
+                {% for p in inicio..fim %}
+                    <li class="page-item {{ p == paginaAtual ? 'active' }}">
+                        <a class="page-link" href="{{ path(rota, params|merge({'pagina': p, 'limite': limiteAtual})) }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+
+                {% if fim < totalPaginas %}
+                    {% if fim < totalPaginas - 1 %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(rota, params|merge({'pagina': totalPaginas, 'limite': limiteAtual})) }}">
+                            {{ totalPaginas }}
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item {{ paginaAtual == totalPaginas ? 'disabled' }}">
+                    <a class="page-link" href="{{ path(rota, params|merge({'pagina': paginaAtual + 1, 'limite': limiteAtual})) }}">
+                        Próximo &raquo;
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    {% endif %}
 </div>
-{% endif %}
-
-{% if totalPaginas > 1 %}
-<nav aria-label="Paginação">
-    <ul class="pagination justify-content-center">
-
-        <li class="page-item {{ paginaAtual == 1 ? 'disabled' }}">
-            <a class="page-link" href="{{ path(rota, params|merge({'pagina': paginaAtual - 1, 'limite': limiteAtual})) }}">
-                &laquo; Anterior
-            </a>
-        </li>
-
-        {% set inicio = max(1, paginaAtual - 2) %}
-        {% set fim    = min(totalPaginas, paginaAtual + 2) %}
-
-        {% if inicio > 1 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path(rota, params|merge({'pagina': 1, 'limite': limiteAtual})) }}">1</a>
-            </li>
-            {% if inicio > 2 %}
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            {% endif %}
-        {% endif %}
-
-        {% for p in inicio..fim %}
-            <li class="page-item {{ p == paginaAtual ? 'active' }}">
-                <a class="page-link" href="{{ path(rota, params|merge({'pagina': p, 'limite': limiteAtual})) }}">{{ p }}</a>
-            </li>
-        {% endfor %}
-
-        {% if fim < totalPaginas %}
-            {% if fim < totalPaginas - 1 %}
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            {% endif %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path(rota, params|merge({'pagina': totalPaginas, 'limite': limiteAtual})) }}">
-                    {{ totalPaginas }}
-                </a>
-            </li>
-        {% endif %}
-
-        <li class="page-item {{ paginaAtual == totalPaginas ? 'disabled' }}">
-            <a class="page-link" href="{{ path(rota, params|merge({'pagina': paginaAtual + 1, 'limite': limiteAtual})) }}">
-                Próximo &raquo;
-            </a>
-        </li>
-
-    </ul>
-</nav>
-{% endif %}
-
 {# Navega ao selecionar — o value já é a URL completa #}
 <script>
     document.getElementById('selectLimite')

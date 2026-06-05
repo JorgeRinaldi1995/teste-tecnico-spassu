@@ -1,0 +1,12 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h1>{{ title }}</h1>
+
+    {% if new_route is defined %}
+        <a href="{{ path(new_route) }}"
+           class="btn btn-primary">
+            {{ new_label|default('Novo') }}
+        </a>
+    {% endif %}
+
+</div>

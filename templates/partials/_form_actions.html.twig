@@ -1,0 +1,14 @@
+<div class="mt-3 d-flex gap-2">
+
+    <button type="submit" class="btn btn-success">
+        {{ button_label }}
+    </button>
+
+    {% if back_route %}
+        <a href="{{ path(back_route) }}"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+    {% endif %}
+
+</div>

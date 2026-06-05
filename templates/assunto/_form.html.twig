@@ -1,14 +1,7 @@
-{{ form_start(form) }}
+{% extends 'partials/_form_layout.html.twig' %}
 
-{{ form_row(form.descricao) }}
+{% set back_route = 'assunto_index' %}
 
-<button class="btn btn-success">
-    {{ button_label|default('Salvar') }}
-</button>
-
-<a href="{{ path('assunto_index') }}"
-   class="btn btn-secondary">
-    Voltar
-</a>
-
-{{ form_end(form) }}
+{% block form_fields %}
+    {{ form_row(form.descricao) }}
+{% endblock %}

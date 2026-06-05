@@ -1,0 +1,17 @@
+<div class="btn-group">
+
+    {% if show_route is defined %}
+        <a href="{{ path(show_route, route_params) }}"
+           class="btn btn-info btn-sm">
+            Ver
+        </a>
+    {% endif %}
+
+    {% if edit_route is defined %}
+        <a href="{{ path(edit_route, route_params) }}"
+           class="btn btn-warning btn-sm">
+            Editar
+        </a>
+    {% endif %}
+
+</div>
