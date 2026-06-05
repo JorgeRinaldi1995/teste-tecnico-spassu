@@ -52,6 +52,7 @@ class LivroController extends AbstractController
 
             $this->livroService->criar($livro);
 
+            $this->addFlash('success', 'Livro cadastrado com sucesso!');
             return $this->redirectToRoute('livro_index');
         }
 

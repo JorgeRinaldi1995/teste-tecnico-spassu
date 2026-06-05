@@ -1,0 +1,65 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 3px solid;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: alert-slide-in 0.3s ease;
+}
+
+.alert + .alert { 
+  margin-top: 10px; 
+}
+
+.alert-icon { 
+  font-size: 18px; 
+  flex-shrink: 0; 
+  margin-top: 1px; 
+}
+
+.alert-body { 
+  flex: 1; 
+}
+
+.alert-label {
+  font-size: 11px; 
+  font-weight: 600;
+  letter-spacing: 0.05em; 
+  text-transform: uppercase;
+  opacity: 0.7; 
+  margin: 0 0 2px;
+}
+
+.alert-message { 
+  margin: 0; 
+}
+
+.alert-close {
+  background: none; 
+  border: none; 
+  cursor: pointer;
+  font-size: 16px; 
+  padding: 2px; 
+  opacity: 0.5;
+  flex-shrink: 0; 
+  line-height: 1; 
+  color: inherit;
+}
+
+.alert-close:hover { 
+  opacity: 1; 
+}
+
+/* --- tipos --- */
+.alert-success { background: #EAF3DE; border-color: #639922; color: #27500A; }
+.alert-error   { background: #FCEBEB; border-color: #E24B4A; color: #791F1F; }
+.alert-warning { background: #FAEEDA; border-color: #BA7517; color: #633806; }
+.alert-info    { background: #E6F1FB; border-color: #378ADD; color: #0C447C; }
+
+@keyframes alert-slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}

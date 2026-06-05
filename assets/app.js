@@ -6,9 +6,10 @@ import './stimulus_bootstrap.js';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
-import './styles/components/form.css';
+import './styles/components/alert.css';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './js/alert.js';
 
 import { initLivroForm } from './js/livro-form.js';
 

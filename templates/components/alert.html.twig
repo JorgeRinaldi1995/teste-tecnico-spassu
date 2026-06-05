@@ -1,0 +1,28 @@
+{#
+  Variáveis esperadas:
+    - type    : string  (success | error | warning | info | danger → mapeado para error)
+    - message : string
+#}
+
+{% set config = {
+    'success': { icon: 'ti-circle-check',    label: 'Sucesso',     class: 'alert-success' },
+    'error':   { icon: 'ti-circle-x',        label: 'Erro',        class: 'alert-error'   },
+    'danger':  { icon: 'ti-circle-x',        label: 'Erro',        class: 'alert-error'   },
+    'warning': { icon: 'ti-alert-triangle',  label: 'Atenção',     class: 'alert-warning' },
+    'info':    { icon: 'ti-info-circle',      label: 'Informação',  class: 'alert-info'    },
+} %}
+
+{% set cfg = config[type] ?? config['info'] %}
+
+<div class="alert {{ cfg.class }}" role="alert" aria-live="polite">
+    <i class="ti {{ cfg.icon }} alert-icon" aria-hidden="true"></i>
+
+    <div class="alert-body">
+        <p class="alert-label">{{ cfg.label }}</p>
+        <p class="alert-message">{{ message }}</p>
+    </div>
+
+    <button class="alert-close" type="button" aria-label="Fechar alerta">
+        <i class="ti ti-x" aria-hidden="true"></i>
+    </button>
+</div>
