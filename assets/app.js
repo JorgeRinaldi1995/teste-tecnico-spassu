@@ -10,4 +10,9 @@ import './styles/components/form.css';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { initLivroForm } from './js/livro-form.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    initLivroForm();
+});
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

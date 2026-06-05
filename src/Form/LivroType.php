@@ -23,6 +23,7 @@ class LivroType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'maxlength' => 40,
+                    'placeholder' => 'Titulo...',
                 ],
             ])
             ->add('editora', TextType::class, [
@@ -30,11 +31,17 @@ class LivroType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'maxlength' => 40,
+                    'placeholder' => 'Editora...',
                 ],
             ])
             ->add('edicao', IntegerType::class, [
                 'label' => 'Edição',
                 'required' => true,
+                'attr' => [
+                    'min' => 1,
+                    'maxlength' => 40,
+                    'placeholder' => 'Edição...',
+                ],
             ])
             ->add('anoPublicacao', TextType::class, [
                 'label' => 'Ano Publicação',
@@ -52,6 +59,10 @@ class LivroType extends AbstractType
                 'currency' => 'BRL',
                 'required' => true,
                 'scale' => 2,
+                'attr' => [
+                    'maxlength' => 40,
+                    'placeholder' => 'Preço do livro em BRL',
+                ],
             ])
             ->add('autores', EntityType::class, [
                 'class' => Autor::class,

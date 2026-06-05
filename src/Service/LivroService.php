@@ -60,6 +60,13 @@ class LivroService
 
     private function validarLivro(Livro $livro): void
     {
+        $anoAtual = (int) date('Y');
+        
+        if ($livro->getAnoPublicacao() > $anoAtual) {
+            throw new DomainException(
+                'O ano não pode ser maior que o ano atual.'
+            );
+        }
         if ($livro->getAutores()->isEmpty()) {
             throw new \DomainException(
                 'O livro deve possuir ao menos um autor.'

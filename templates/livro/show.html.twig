@@ -4,37 +4,47 @@
 
 {% block body %}
 
-<h1 class="mb-4">
-    Detalhes do Livro
-</h1>
+    <h1>{{ livro.titulo }}</h1>
 
-<table class="table table-bordered">
-    <tr>
-        <th width="200">Código</th>
-        <td>{{ livro.codl }}</td>
-    </tr>
+    <dl>
+        <dt>Editora</dt>
+        <dd>{{ livro.editora ?? '—' }}</dd>
 
-    <tr>
-        <th>Título</th>
-        <td>{{ livro.titulo }}</td>
-    </tr>
+        <dt>Edição</dt>
+        <dd>{{ livro.edicao ?? '—' }}</dd>
 
-    <tr>
-        <th>Editora</th>
-        <td>{{ livro.editora }}</td>
-    </tr>
+        <dt>Ano de Publicação</dt>
+        <dd>{{ livro.anoPublicacao ?? '—' }}</dd>
 
-    <tr>
-        <th>Edição</th>
-        <td>{{ livro.edicao }}</td>
-    </tr>
+        <dt>Preço</dt>
+        <dd><span>R$: </span>{{ livro.valor is not null ? livro.valor|number_format(2, ',', '.') : '—' }}</dd>
+    </dl>
+    <section>
+        <h2>Autores</h2>
 
-    <tr>
-        <th>Ano de Publicação</th>
-        <td>{{ livro.anoPublicacao }}</td>
-    </tr>
-</table>
+        {% if livro.autores is empty %}
+            <p>Nenhum autor cadastrado.</p>
+        {% else %}
+            <ul>
+                {% for autor in livro.autores %}
+                    <li>{{ autor.nome }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+    <section>
+        <h2>Assuntos</h2>
 
+        {% if livro.assuntos is empty %}
+            <p>Nenhum assunto cadastrado.</p>
+        {% else %}
+            <ul>
+                {% for assunto in livro.assuntos %}
+                    <li>{{ assunto.descricao }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
 <a
     href="{{ path('livro_editar', {'codl': livro.codl}) }}"
     class="btn btn-warning"
