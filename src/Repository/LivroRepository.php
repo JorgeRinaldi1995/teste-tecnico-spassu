@@ -11,6 +11,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class LivroRepository extends ServiceEntityRepository
 {
@@ -66,7 +67,7 @@ class LivroRepository extends ServiceEntityRepository
     /**
      * Retorna todos os livros com autores e assuntos carregados, ordenados por título.
      *
-     * @return Livro[]
+     * @return array{data: Livro[], total: int, pages: int}
      *
      * @throws \RuntimeException em falha de infraestrutura
      */
@@ -75,15 +76,21 @@ class LivroRepository extends ServiceEntityRepository
         $offset = 0
     ): array {
         try {
-            return $this->createQueryBuilder('l')
+            $qb = $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
                 ->leftJoin('l.assuntos', 's')
                 ->addSelect('a', 's')
                 ->orderBy('l.titulo', 'ASC')
                 ->setMaxResults($limit)
-                ->setFirstResult($offset)
-                ->getQuery()
-                ->getResult();
+                ->setFirstResult($offset);
+
+            $paginator = new Paginator($qb->getQuery(), fetchJoinCollection: true);
+
+            return [
+                'data'  => iterator_to_array($paginator),
+                'total' => count($paginator),
+                'pages' => (int) ceil(count($paginator) / $limit),
+            ];
 
         } catch (ORMException $e) {
             $this->logger->error('Erro ORM ao listar livros com relações.', [

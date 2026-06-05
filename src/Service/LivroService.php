@@ -7,14 +7,21 @@ use App\Repository\LivroRepository;
 
 class LivroService
 {
+    public const LIVROS_POR_PAGINA = 20;
+
     public function __construct(
         private readonly LivroRepository $livroRepository
     ) {
     }
 
-    public function listarTodos(): array
+    public function listarTodos(int $pagina = 1, int $limite = self::LIVROS_POR_PAGINA): array
     {
-        return $this->livroRepository->findAllWithRelations();
+        $offset = ($pagina - 1) * $limite;
+
+        return $this->livroRepository->findAllWithRelations(
+            limit: $limite,
+            offset: $offset
+        );
     }
 
     public function buscarPorCodigo(int $codl): ?Livro

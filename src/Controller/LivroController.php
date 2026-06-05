@@ -18,10 +18,25 @@ class LivroController extends AbstractController
     ) {}
 
     #[Route('/', name: 'livro_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $limitesPermitidos = [5, 10, 20, 50, 100];
+        $limite = $request->query->getInt('limite', LivroService::LIVROS_POR_PAGINA);
+
+        if (!in_array($limite, $limitesPermitidos, true)) {
+            $limite = LivroService::LIVROS_POR_PAGINA;
+        }
+
+        $pagina = max(1, $request->query->getInt('pagina', 1));
+
+        $resultado = $this->livroService->listarTodos($pagina, $limite);
+
         return $this->render('livro/index.html.twig', [
-            'livros' => $this->livroService->listarTodos(),
+            'livros'           => $resultado['data'],
+            'totalPaginas'     => $resultado['pages'],
+            'paginaAtual'      => $pagina,
+            'limiteAtual'      => $limite,
+            'limitesPermitidos' => $limitesPermitidos,
         ]);
     }
 
