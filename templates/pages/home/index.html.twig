@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="container mt-5">
+
+    <h1 class="mb-4 text-center">Bem-vindo ao sistema de Livros</h1>
+
+    <div class="row justify-content-center">
+
+        <!-- CARD LIVROS -->
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Livros</h5>
+                    <p class="card-text">
+                        Gerencie os livros cadastrados no sistema.
+                    </p>
+                    <a href="{{ path('livro_index') }}" class="btn btn-primary">
+                        Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD ASSUNTOS -->
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Assuntos</h5>
+                    <p class="card-text">
+                        Gerencie os assuntos relacionados aos livros.
+                    </p>
+                    <a href="{{ path('assunto_index') }}" class="btn btn-success">
+                        Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD AUTORES -->
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Autores</h5>
+                    <p class="card-text">
+                        Gerencie os autores cadastrados.
+                    </p>
+                    <a href="{{ path('autor_index') }}" class="btn btn-warning">
+                        Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

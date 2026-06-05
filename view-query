@@ -1,0 +1,23 @@
+CREATE VIEW vw_relatorio_livros AS
+SELECT
+    l.Codl AS livro_id,
+    l.Titulo AS titulo,
+    l.Editora AS editora,
+    l.Edicao AS edicao,
+    l.AnoPublicacao AS ano_publicacao,
+
+    a.CodAu AS autor_id,
+    a.Nome AS autor,
+
+    s.CodAs AS assunto_id,
+    s.Descricao AS assunto
+
+FROM Livro l
+INNER JOIN Livro_Autor la
+    ON la.Livro_Codl = l.Codl
+INNER JOIN Autor a
+    ON a.CodAu = la.Autor_CodAu
+LEFT JOIN Livro_Assunto ls
+    ON ls.Livro_Codl = l.Codl
+LEFT JOIN Assunto s
+    ON s.CodAs = ls.Assunto_codas;
