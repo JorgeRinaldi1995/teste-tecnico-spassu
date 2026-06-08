@@ -32,8 +32,13 @@ class LivroRepository extends ServiceEntityRepository
     public function findWithRelations(int $codl): ?Livro
     {
         if ($codl <= 0) {
+
+            $this->logger->warning('Código de livro inválido informado.', [
+                'codl' => $codl,
+            ]);
+
             throw new \InvalidArgumentException(
-                "O código do livro deve ser um inteiro positivo, '{$codl}' fornecido."
+                "O código do livro deve ser positivo."
             );
         }
 
@@ -54,13 +59,18 @@ class LivroRepository extends ServiceEntityRepository
             ]);
 
             throw new \RuntimeException("Inconsistência de dados: mais de um livro encontrado para o código {$codl}.", 0, $e);
-        } catch (ORMException $e) {
-            $this->logger->error('Erro de ORM ao buscar livro com relações.', [
-                'codl'      => $codl,
-                'exception' => $e->getMessage(),
+        
+        } catch (\Throwable $e) {
+
+            $this->logger->critical('Erro inesperado ao buscar livro.', [
+                'codl' => $codl,
+                'exception' => $e,
             ]);
 
-            throw new \RuntimeException('Erro ao consultar o livro. Tente novamente mais tarde.', 0, $e);
+            throw new \RuntimeException(
+                'Erro ao consultar livro.',
+                previous: $e
+            );
         }
     }
 
@@ -76,6 +86,18 @@ class LivroRepository extends ServiceEntityRepository
         $offset = 0
     ): array {
         try {
+            if ($limit <= 0) {
+                throw new \InvalidArgumentException(
+                    'O limite deve ser maior que zero.'
+                );
+            }
+
+            if ($offset < 0) {
+                throw new \InvalidArgumentException(
+                    'O offset não pode ser negativo.'
+                );
+            }
+
             $qb = $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
                 ->leftJoin('l.assuntos', 's')
@@ -92,7 +114,7 @@ class LivroRepository extends ServiceEntityRepository
                 'pages' => (int) ceil(count($paginator) / $limit),
             ];
 
-        } catch (ORMException $e) {
+        } catch (\Throwable $e){
             $this->logger->error('Erro ORM ao listar livros com relações.', [
                 'exception' => $e->getMessage(),
             ]);
@@ -189,6 +211,12 @@ class LivroRepository extends ServiceEntityRepository
             if ($flush) {
                 $this->getEntityManager()->flush();
             }
+
+            $this->logger->info('Livro salvo com sucesso.', [
+                'livro_id' => $livro->getCodl(),
+                'titulo' => $livro->getTitulo(),
+            ]);
+
         } catch (OptimisticLockException $e) {
             $this->logger->error('Conflito de concorrência ao salvar livro.', [
                 'livro_id'  => $livro->getCodl(),
@@ -207,14 +235,16 @@ class LivroRepository extends ServiceEntityRepository
             throw new \RuntimeException(
                 'Já existe um livro cadastrado com esses dados.', 0, $e
             );
-        } catch (ORMException $e) {
-            $this->logger->error('Erro de ORM ao salvar livro.', [
-                'livro_id'  => $livro->getCodl(),
-                'exception' => $e->getMessage(),
+        } catch (\Throwable $e) {
+
+            $this->logger->critical('Erro inesperado ao salvar livro.', [
+                'livro_id' => $livro->getCodl(),
+                'exception' => $e,
             ]);
 
             throw new \RuntimeException(
-                'Erro ao salvar o livro. Tente novamente mais tarde.', 0, $e
+                'Erro interno ao salvar o livro.',
+                previous: $e
             );
         }
     }
@@ -232,23 +262,25 @@ class LivroRepository extends ServiceEntityRepository
             if ($flush) {
                 $this->getEntityManager()->flush();
             }
-        } catch (ForeignKeyConstraintViolationException $e) {
-            $this->logger->error('Violação de chave estrangeira ao remover livro.', [
+        } catch (OptimisticLockException $e) {
+            $this->logger->error('Conflito de concorrência ao salvar livro.', [
                 'livro_id'  => $livro->getCodl(),
                 'exception' => $e->getMessage(),
             ]);
 
             throw new \RuntimeException(
-                'Não é possível remover o livro pois ele está vinculado a outros registros.', 0, $e
+                'O livro foi modificado por outro processo. Recarregue e tente novamente.', 0, $e
             );
-        } catch (ORMException $e) {
-            $this->logger->error('Erro ORM ao remover livro.', [
-                'livro_id'  => $livro->getCodl(),
-                'exception' => $e->getMessage(),
+        } catch (\Throwable $e) {
+
+            $this->logger->critical('Erro inesperado ao salvar livro.', [
+                'livro_id' => $livro->getCodl(),
+                'exception' => $e,
             ]);
 
             throw new \RuntimeException(
-                'Erro ao remover o livro. Tente novamente mais tarde.', 0, $e
+                'Erro interno ao salvar o livro.',
+                previous: $e
             );
         }
     }
