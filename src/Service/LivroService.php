@@ -43,7 +43,19 @@ class LivroService
         int $pagina = 1,
         int $limite = self::LIVROS_POR_PAGINA
     ): array {
+        if ($limite <= 0) {
+            throw new \InvalidArgumentException(
+                'O limite deve ser maior que zero.'
+            );
+        }
+
         $offset = ($pagina - 1) * $limite;
+
+        if ($offset < 0) {
+            throw new \InvalidArgumentException(
+                'O offset não pode ser negativo.'
+            );
+        }
 
         return $this->livroRepository->findAllWithRelations(
             limit: $limite,

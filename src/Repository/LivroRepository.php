@@ -25,23 +25,12 @@ class LivroRepository extends ServiceEntityRepository
     /**
      * Busca um Livro pelo código primário com autores e assuntos carregados.
      *
-     * @throws \RuntimeException em falha de infraestrutura
+     * @throws \RepositoryException em falha de infraestrutura
      * @throws \InvalidArgumentException se $codl for inválido
      */
 
     public function findWithRelations(int $codl): ?Livro
     {
-        if ($codl <= 0) {
-
-            $this->logger->warning('Código de livro inválido informado.', [
-                'codl' => $codl,
-            ]);
-
-            throw new \InvalidArgumentException(
-                "O código do livro deve ser positivo."
-            );
-        }
-
         try {
             return $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
@@ -53,12 +42,12 @@ class LivroRepository extends ServiceEntityRepository
                 ->getOneOrNullResult();
 
         } catch (NonUniqueResultException $e) {
-            $this->logger->error('Resultado não único ao buscar livro por codl.', [
+            $this->logger->critical('Resultado não único ao buscar livro por codl.', [
                 'codl'      => $codl,
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException("Inconsistência de dados: mais de um livro encontrado para o código {$codl}.", 0, $e);
+            throw new \RepositoryException("Inconsistência de dados: mais de um livro encontrado para o código {$codl}.", 0, $e);
         
         } catch (\Throwable $e) {
 
@@ -79,24 +68,13 @@ class LivroRepository extends ServiceEntityRepository
      *
      * @return array{data: Livro[], total: int, pages: int}
      *
-     * @throws \RuntimeException em falha de infraestrutura
+     * @throws \RepositoryException em falha de infraestrutura
      */
     public function findAllWithRelations(
         $limit = 20,
         $offset = 0
     ): array {
         try {
-            if ($limit <= 0) {
-                throw new \InvalidArgumentException(
-                    'O limite deve ser maior que zero.'
-                );
-            }
-
-            if ($offset < 0) {
-                throw new \InvalidArgumentException(
-                    'O offset não pode ser negativo.'
-                );
-            }
 
             $qb = $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
@@ -119,7 +97,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException('Erro ao listar os livros. Tente novamente mais tarde.', 0, $e);
+            throw new \RepositoryException('Erro ao listar os livros. Tente novamente mais tarde.', 0, $e);
         }
     }
 
@@ -129,16 +107,10 @@ class LivroRepository extends ServiceEntityRepository
      * @return Livro[]
      *
      * @throws \InvalidArgumentException se $codau for inválido
-     * @throws \RuntimeException         em falha de infraestrutura
+     * @throws \RepositoryException         em falha de infraestrutura
      */
     public function findByAutor(int $codau): array
     {
-        if ($codau <= 0) {
-            throw new \InvalidArgumentException(
-                "O código do autor deve ser um inteiro positivo, '{$codau}' fornecido."
-            );
-        }
-
         try {
             return $this->createQueryBuilder('l')
                 ->innerJoin('l.autores', 'a')
@@ -155,7 +127,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException('Erro ao consultar livros por autor. Tente novamente mais tarde.', 0, $e);
+            throw new \RepositoryException('Erro ao consultar livros por autor. Tente novamente mais tarde.', 0, $e);
         }
     }
 
@@ -165,16 +137,10 @@ class LivroRepository extends ServiceEntityRepository
      * @return Livro[]
      *
      * @throws \InvalidArgumentException se $codas for inválido
-     * @throws \RuntimeException         em falha de infraestrutura
+     * @throws \RepositoryException         em falha de infraestrutura
      */
     public function findByAssunto(int $codas): array
     {
-        if ($codas <= 0) {
-            throw new \InvalidArgumentException(
-                "O código do assunto deve ser um inteiro positivo, '{$codas}' fornecido."
-            );
-        }
-
         try {
             return $this->createQueryBuilder('l')
                 ->innerJoin('l.assuntos', 's')
@@ -190,7 +156,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException('Erro ao consultar livros por assunto. Tente novamente mais tarde.', 0, $e);
+            throw new \RepositoryException('Erro ao consultar livros por assunto. Tente novamente mais tarde.', 0, $e);
         }
     }
 
@@ -201,7 +167,7 @@ class LivroRepository extends ServiceEntityRepository
      * feita na camada de serviço/use-case antes de chamar este método.
      * O repositório é responsável apenas pela persistência.
      *
-     * @throws \RuntimeException em falha de persistência ou violação de constraint
+     * @throws \RepositoryException em falha de persistência ou violação de constraint
      */
     public function save(Livro $livro, bool $flush = false): void
     {
@@ -223,16 +189,16 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException(
+            throw new \RepositoryException(
                 'O livro foi modificado por outro processo. Recarregue e tente novamente.', 0, $e
             );
         } catch (UniqueConstraintViolationException $e) {
-            $this->logger->error('Violação de unicidade ao salvar livro.', [
+            $this->logger->critical('Violação de unicidade ao salvar livro.', [
                 'livro_id'  => $livro->getCodl(),
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException(
+            throw new \RepositoryException(
                 'Já existe um livro cadastrado com esses dados.', 0, $e
             );
         } catch (\Throwable $e) {
@@ -242,7 +208,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e,
             ]);
 
-            throw new \RuntimeException(
+            throw new \RepositoryException(
                 'Erro interno ao salvar o livro.',
                 previous: $e
             );
@@ -263,12 +229,12 @@ class LivroRepository extends ServiceEntityRepository
                 $this->getEntityManager()->flush();
             }
         } catch (OptimisticLockException $e) {
-            $this->logger->error('Conflito de concorrência ao salvar livro.', [
+            $this->logger->critical('Conflito de concorrência ao salvar livro.', [
                 'livro_id'  => $livro->getCodl(),
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException(
+            throw new \RepositoryException(
                 'O livro foi modificado por outro processo. Recarregue e tente novamente.', 0, $e
             );
         } catch (\Throwable $e) {
@@ -278,7 +244,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e,
             ]);
 
-            throw new \RuntimeException(
+            throw new \RepositoryException(
                 'Erro interno ao salvar o livro.',
                 previous: $e
             );
