@@ -4,16 +4,24 @@ namespace App\Service;
 
 use App\Entity\Livro;
 use App\Repository\LivroRepository;
+use App\Exception\Livro\LivroInvalidoException;
 use App\Exception\Livro\AnoPublicacaoInvalidoException;
 use App\Exception\Livro\LivroSemAutorException;
 use App\Exception\Livro\LivroSemAssuntoException;
 use App\Exception\Livro\LivroNaoEncontradoException;
+use App\Exception\Livro\LivroSemTituloException;
+use App\Exception\Livro\LivroSemEditoraException;
+use App\Exception\Livro\LivroSemEdicaoException;
+use App\Exception\Livro\LivroSemValorException;
+use App\DTO\PaginatedResult;
 
 /**
  * Serviço responsável pelas regras de negócio relacionadas aos livros.
  *
  * Centraliza operações de consulta, criação, atualização e remoção
  * de livros, além de aplicar validações de domínio antes da persistência.
+ * 
+ * @package App\Service
  */
 class LivroService
 {
@@ -21,6 +29,11 @@ class LivroService
      * Quantidade padrão de livros exibidos por página.
      */
     public const LIVROS_POR_PAGINA = 20;
+
+    /**
+     * Quantidade máxima de livros permitida por página.
+     */
+    private const LIMITE_MAXIMO_POR_PAGINA = 100;
 
     public function __construct(
         private readonly LivroRepository $livroRepository
@@ -30,47 +43,52 @@ class LivroService
     /**
      * Retorna uma lista paginada de livros com seus autores e assuntos.
      *
-     * @param int $pagina Número da página desejada.
-     * @param int $limite Quantidade de registros por página.
+     * @param int $pagina Número da página desejada (mínimo: 1).
+     * @param int $limite Quantidade de registros por página (entre 1 e 100).
      *
-     * @return array{
-     *     data: Livro[],
-     *     total: int,
-     *     pages: int
-     * }
+     * @return PaginatedResult<Livro>
+     * 
+     * @throws \InvalidArgumentException Se $pagina < 1 ou $limite fora do intervalo [1, 100].
+     * 
      */
     public function listarTodos(
         int $pagina = 1,
         int $limite = self::LIVROS_POR_PAGINA
-    ): array {
-        if ($limite <= 0) {
-            throw new \InvalidArgumentException(
-                'O limite deve ser maior que zero.'
+    ): PaginatedResult {
+        if ($pagina < 1) {
+            throw new \InvalidArgumentException('A página deve ser maior que zero.');
+        }
+
+        if ($limite < 1 || $limite > self::LIMITE_MAXIMO_POR_PAGINA) {
+             throw new \InvalidArgumentException(
+                sprintf('O limite deve estar entre 1 e %d.', self::LIMITE_MAXIMO_POR_PAGINA)
             );
         }
 
-        $offset = ($pagina - 1) * $limite;
+        $offset    = ($pagina - 1) * $limite;
+        $resultado = $this->livroRepository->findAllWithRelations(
+            limit:  $limite,
+            offset: $offset,
+        );
 
-        if ($offset < 0) {
-            throw new \InvalidArgumentException(
-                'O offset não pode ser negativo.'
-            );
-        }
-
-        return $this->livroRepository->findAllWithRelations(
-            limit: $limite,
-            offset: $offset
+        return new PaginatedResult(
+            data:  $resultado['data'],
+            total: $resultado['total'],
+            pages: (int) ceil($resultado['total'] / $limite),
         );
     }
 
     /**
-     * Busca um livro pelo código primário carregando autores e assuntos.
+     * Busca um livro pelo código primário, carregando autores e assuntos.
      *
-     * @param int $codl Código do livro.
+     * @param int $codl Código (PK) do livro.
      *
-     * @return Livro|null Retorna o livro encontrado ou null.
+     * @return Livro Livro encontrado.
+     *
+     * @throws LivroNaoEncontradoException Se nenhum livro for encontrado com o código informado.
+     *
      */
-    public function buscarPorCodigo(int $codl): ?Livro
+    public function buscarPorCodigo(int $codl): Livro
     {
         $livro = $this->livroRepository->findWithRelations($codl);
 
@@ -82,13 +100,13 @@ class LivroService
     }
 
     /**
-     * Cria um novo livro.
-     *
-     * Antes da persistência são executadas validações de domínio.
+     * Cria um novo livro aplicando validações de domínio antes da persistência.
      *
      * @param Livro $livro Entidade a ser persistida.
      *
-     * @throws \DomainException Quando alguma regra de negócio é violada.
+     * @return void
+     *
+     * @throws LivroInvalidoException Se uma ou mais regras de negócio forem violadas.
      */
     public function criar(Livro $livro): void
     {
@@ -98,13 +116,13 @@ class LivroService
     }
 
     /**
-     * Atualiza um livro existente.
-     *
-     * Antes da persistência são executadas validações de domínio.
+     * Atualiza um livro existente aplicando validações de domínio antes da persistência.
      *
      * @param Livro $livro Entidade a ser atualizada.
      *
-     * @throws \DomainException Quando alguma regra de negócio é violada.
+     * @return void
+     *
+     * @throws LivroInvalidoException Se uma ou mais regras de negócio forem violadas.
      */
     public function atualizar(Livro $livro): void
     {
@@ -114,9 +132,11 @@ class LivroService
     }
 
     /**
-     * Remove um livro.
+     * Remove um livro da base de dados.
      *
      * @param Livro $livro Entidade a ser removida.
+     *
+     * @return void
      */
     public function remover(Livro $livro): void
     {
@@ -126,9 +146,9 @@ class LivroService
     /**
      * Retorna todos os livros associados a um autor.
      *
-     * @param int $codau Código do autor.
+     * @param int $codau Código (PK) do autor.
      *
-     * @return Livro[]
+     * @return Livro[] Lista de livros do autor. Retorna array vazio se não houver nenhum.
      */
     public function listarPorAutor(int $codau): array
     {
@@ -138,9 +158,9 @@ class LivroService
     /**
      * Retorna todos os livros associados a um assunto.
      *
-     * @param int $codas Código do assunto.
+     * @param int $codas Código (PK) do assunto.
      *
-     * @return Livro[]
+     * @return Livro[] Lista de livros do assunto. Retorna array vazio se não houver nenhum.
      */
     public function listarPorAssunto(int $codas): array
     {
@@ -150,29 +170,58 @@ class LivroService
     /**
      * Valida as regras de negócio de um livro.
      *
-     * Regras:
-     * - O ano de publicação não pode ser maior que o ano atual.
+     * Coleta todas as violações antes de lançar a exceção, garantindo que
+     * o chamador receba o conjunto completo de erros em uma única chamada.
+     *
+     * Regras aplicadas:
+     * - Título não pode ser vazio ou conter apenas espaços.
+     * - Editora não pode ser vazia ou conter apenas espaços.
+     * - Edição não pode ser vazia ou conter apenas espaços.
+     * - Ano de publicação não pode ser superior ao ano corrente.
+     * - Valor deve ser maior que zero.
      * - O livro deve possuir ao menos um autor.
      * - O livro deve possuir ao menos um assunto.
      *
      * @param Livro $livro Entidade a ser validada.
      *
-     * @throws \DomainException Quando alguma regra de negócio é violada.
+     * @return void
+     *
+     * @throws LivroInvalidoException Agrega todas as violações encontradas.
      */
     private function validarLivro(Livro $livro): void
     {
-        $anoAtual = (int) date('Y');
+        $violacoes = [];
 
-        if ($livro->getAnoPublicacao() > $anoAtual) {
-            throw new AnoPublicacaoInvalidoException();
+        if (empty(trim($livro->getTitulo()))) {
+            $violacoes[] = new LivroSemTituloException();
+        }
+
+        if (empty(trim($livro->getEditora()))) {
+            $violacoes[] = new LivroSemEditoraException();
+        }
+
+        if ($livro->getEdicao() <= 0) {
+            $violacoes[] = new LivroSemEdicaoException();
+        }
+
+        if ($livro->getAnoPublicacao() > (int) date('Y')) {
+            $violacoes[] = new AnoPublicacaoInvalidoException();
+        }
+
+        if ($livro->getValor() <= 0) {
+            $violacoes[] = new LivroSemValorException();
         }
 
         if ($livro->getAutores()->isEmpty()) {
-            throw new LivroSemAutorException();
+            $violacoes[] = new LivroSemAutorException();
         }
 
         if ($livro->getAssuntos()->isEmpty()) {
-            throw new LivroSemAssuntoException();
+            $violacoes[] = new LivroSemAssuntoException();
+        }
+
+        if (!empty($violacoes)) {
+            throw new LivroInvalidoException($violacoes);
         }
     }
 }
