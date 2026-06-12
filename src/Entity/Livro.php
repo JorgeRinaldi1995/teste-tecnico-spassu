@@ -17,7 +17,7 @@ class Livro
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'codl', type: 'integer')]
-    private int $codl;
+    private ?int $codl = null;
 
     #[ORM\Column(length: 40)]
     #[Assert\NotBlank(message: 'O título é obrigatório.')]
@@ -81,7 +81,7 @@ class Livro
         $this->assuntos = new ArrayCollection();
     }
 
-    public function getCodl(): int
+    public function getCodl(): ?int
     {
         return $this->codl;
     }
@@ -130,7 +130,7 @@ class Livro
         return $this;
     }
 
-        public function getValor(): string
+    public function getValor(): string
     {
         return $this->valor;
     }
