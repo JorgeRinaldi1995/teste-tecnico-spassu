@@ -13,6 +13,12 @@ use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * @phpstan-type LivroResult array{
+ *     data: Livro[],
+ *     total: int
+ * }
+ */
 class LivroRepository extends ServiceEntityRepository
 {
     public function __construct(
@@ -66,7 +72,7 @@ class LivroRepository extends ServiceEntityRepository
     /**
      * Retorna todos os livros com autores e assuntos carregados, ordenados por título.
      *
-     * @return array{data: Livro[], total: int, pages: int}
+     * @return LivroResult
      *
      * @throws \RepositoryException em falha de infraestrutura
      */
@@ -89,7 +95,6 @@ class LivroRepository extends ServiceEntityRepository
             return [
                 'data'  => iterator_to_array($paginator),
                 'total' => count($paginator),
-                'pages' => (int) ceil(count($paginator) / $limit),
             ];
 
         } catch (\Throwable $e){
@@ -121,7 +126,7 @@ class LivroRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
 
-        } catch (ORMException $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Erro ORM ao buscar livros por autor.', [
                 'codau'     => $codau,
                 'exception' => $e->getMessage(),
@@ -150,7 +155,7 @@ class LivroRepository extends ServiceEntityRepository
                 ->orderBy('l.titulo', 'ASC')
                 ->getQuery()
                 ->getResult();
-        } catch (ORMException $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Erro ORM ao buscar livros por assunto.', [
                 'codas'     => $codas,
                 'exception' => $e->getMessage(),
