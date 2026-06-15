@@ -61,6 +61,9 @@ class Livro
     )]
     private string $valor;
 
+    /**
+     * @var Collection<int, Autor>
+     */
     #[ORM\ManyToMany(targetEntity: Autor::class, inversedBy: 'livros', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'livro_autor')]
     #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
@@ -68,6 +71,9 @@ class Livro
     #[Assert\Count(min: 1, minMessage: 'Selecione pelo menos um autor.')]
     private Collection $autores;
 
+    /**
+     * @var Collection<int, Assunto>
+     */
     #[ORM\ManyToMany(targetEntity: Assunto::class, inversedBy: 'livros', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'livro_assunto')]
     #[ORM\JoinColumn(name: 'livro_codl', referencedColumnName: 'codl')]
@@ -141,6 +147,9 @@ class Livro
         return $this;
     }
 
+    /**
+     * @return Collection<int, Autor>
+     */
     public function getAutores(): Collection
     {
         return $this->autores;
@@ -162,6 +171,9 @@ class Livro
         return $this;
     }
 
+    /**
+     * @return Collection<int, Assunto>
+     */
     public function getAssuntos(): Collection
     {
         return $this->assuntos;

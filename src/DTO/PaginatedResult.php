@@ -10,9 +10,19 @@ namespace App\DTO;
 
 final class PaginatedResult
 {
+    /**
+     * @var list<T>
+     */
+    public readonly array $data;
+
+    /**
+     * @param list<T> $data
+     */
     public function __construct(
-        public readonly array $data,
-        public readonly int   $total,
-        public readonly int   $pages,
-    ) {}
+        array $data,
+        public readonly int $total,
+        public readonly int $pages,
+    ) {
+        $this->data = $data;
+    }
 }

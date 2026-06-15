@@ -25,6 +25,9 @@ class Assunto
     #[ORM\Column(length: 40)]
     private string $descricao;
 
+    /**
+     * @var Collection<int, Livro>
+     */
     #[ORM\ManyToMany(targetEntity: Livro::class, mappedBy: 'assuntos')]
     private Collection $livros;
 
@@ -50,6 +53,9 @@ class Assunto
         return $this;
     }
 
+    /**
+     * @return Collection<int, Livro>
+     */
     public function getLivros(): Collection
     {
         return $this->livros;
