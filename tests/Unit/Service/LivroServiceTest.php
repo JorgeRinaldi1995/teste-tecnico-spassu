@@ -28,6 +28,16 @@ use PHPUnit\Framework\TestCase;
  *
  * Cobre: listarTodos, buscarPorCodigo, criar, atualizar,
  *        remover, listarPorAutor, listarPorAssunto e validarLivro.
+ * 
+ * @phpstan-type LivroBuildArgs array{
+ *     titulo?: string,
+ *     editora?: string,
+ *     edicao?: int,
+ *     anoPublicacao?: string,
+ *     valor?: string,
+ *     comAutor?: bool,
+ *     comAssunto?: bool
+ * }
  */
 class LivroServiceTest extends TestCase
 {
@@ -86,11 +96,20 @@ class LivroServiceTest extends TestCase
      *
      * @param int $total Total de registros.
      * @param int $count Quantidade de livros no array de dados.
+     * 
+     * @return array{
+     *      data: list<Livro>,
+     *      total: int
+     * }
      */
     private function buildRepositoryResult(int $total = 1, int $count = 1): array
     {
         return [
-            'data'  => array_fill(0, $count, $this->createMock(Livro::class)),
+            'data'  => array_fill(
+                0,
+                $count,
+                $this->createMock(Livro::class)
+            ),
             'total' => $total,
         ];
     }
@@ -313,6 +332,9 @@ class LivroServiceTest extends TestCase
         ];
     }
 
+    /**
+     * @param LivroBuildArgs $buildArgs
+     */
     #[Test]
     #[DataProvider('violacoesIndividuaisProvider')]
     public function criarLancaLivroInvalidoComViolacaoEsperada(
@@ -344,6 +366,9 @@ class LivroServiceTest extends TestCase
         }
     }
 
+    /**
+     * @param LivroBuildArgs $buildArgs
+     */
     #[Test]
     #[DataProvider('violacoesIndividuaisProvider')]
     public function atualizarLancaLivroInvalidoComViolacaoEsperada(
