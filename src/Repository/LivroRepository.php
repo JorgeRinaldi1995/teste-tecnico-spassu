@@ -9,13 +9,15 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Exception\RepositoryException;
 
 /**
+ * @extends ServiceEntityRepository<Livro>
+ * 
  * @phpstan-type LivroResult array{
- *     data: Livro[],
+ *     data: list<Livro>,
  *     total: int
  * }
  */
@@ -31,14 +33,15 @@ class LivroRepository extends ServiceEntityRepository
     /**
      * Busca um Livro pelo código primário com autores e assuntos carregados.
      *
-     * @throws \RepositoryException em falha de infraestrutura
+     * @throws RepositoryException em falha de infraestrutura
      * @throws \InvalidArgumentException se $codl for inválido
      */
 
     public function findWithRelations(int $codl): ?Livro
     {
         try {
-            return $this->createQueryBuilder('l')
+            /** @var Livro|null $livro */
+            $livro = $this->createQueryBuilder('l')
                 ->leftJoin('l.autores', 'a')
                 ->leftJoin('l.assuntos', 's')
                 ->addSelect('a', 's')
@@ -47,13 +50,15 @@ class LivroRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getOneOrNullResult();
 
+            return $livro;
+
         } catch (NonUniqueResultException $e) {
             $this->logger->critical('Resultado não único ao buscar livro por codl.', [
                 'codl'      => $codl,
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException("Inconsistência de dados: mais de um livro encontrado para o código {$codl}.", 0, $e);
+            throw new RepositoryException("Inconsistência de dados: mais de um livro encontrado para o código {$codl}.", 0, $e);
         
         } catch (\Throwable $e) {
 
@@ -74,11 +79,11 @@ class LivroRepository extends ServiceEntityRepository
      *
      * @return LivroResult
      *
-     * @throws \RepositoryException em falha de infraestrutura
+     * @throws RepositoryException em falha de infraestrutura
      */
     public function findAllWithRelations(
-        $limit = 20,
-        $offset = 0
+        int $limit = 20,
+        int $offset = 0
     ): array {
         try {
 
@@ -92,8 +97,11 @@ class LivroRepository extends ServiceEntityRepository
 
             $paginator = new Paginator($qb->getQuery(), fetchJoinCollection: true);
 
+            /** @var list<Livro> $livros */
+            $livros = array_values(iterator_to_array($paginator));
+
             return [
-                'data'  => iterator_to_array($paginator),
+                'data'  => $livros,
                 'total' => count($paginator),
             ];
 
@@ -102,22 +110,23 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException('Erro ao listar os livros. Tente novamente mais tarde.', 0, $e);
+            throw new RepositoryException('Erro ao listar os livros. Tente novamente mais tarde.', 0, $e);
         }
     }
 
     /**
      * Retorna livros de um autor específico.
      *
-     * @return Livro[]
+     * @return list<Livro>
      *
      * @throws \InvalidArgumentException se $codau for inválido
-     * @throws \RepositoryException         em falha de infraestrutura
+     * @throws RepositoryException         em falha de infraestrutura
      */
     public function findByAutor(int $codau): array
     {
         try {
-            return $this->createQueryBuilder('l')
+            /** @var list<Livro> $livros */
+            $livros = $this->createQueryBuilder('l')
                 ->innerJoin('l.autores', 'a')
                 ->addSelect('a')
                 ->where('a.codau = :codau')
@@ -126,28 +135,31 @@ class LivroRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
 
+            return $livros;
+
         } catch (\Throwable $e) {
             $this->logger->error('Erro ORM ao buscar livros por autor.', [
                 'codau'     => $codau,
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException('Erro ao consultar livros por autor. Tente novamente mais tarde.', 0, $e);
+            throw new RepositoryException('Erro ao consultar livros por autor. Tente novamente mais tarde.', 0, $e);
         }
     }
 
     /**
      * Retorna livros associados a um assunto específico.
      *
-     * @return Livro[]
+     * @return list<Livro>
      *
      * @throws \InvalidArgumentException se $codas for inválido
-     * @throws \RepositoryException         em falha de infraestrutura
+     * @throws RepositoryException         em falha de infraestrutura
      */
     public function findByAssunto(int $codas): array
     {
         try {
-            return $this->createQueryBuilder('l')
+            /** @var list<Livro> $livros */
+            $livros = $this->createQueryBuilder('l')
                 ->innerJoin('l.assuntos', 's')
                 ->addSelect('s')
                 ->where('s.codas = :codas')
@@ -155,13 +167,15 @@ class LivroRepository extends ServiceEntityRepository
                 ->orderBy('l.titulo', 'ASC')
                 ->getQuery()
                 ->getResult();
+
+            return $livros;
         } catch (\Throwable $e) {
             $this->logger->error('Erro ORM ao buscar livros por assunto.', [
                 'codas'     => $codas,
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException('Erro ao consultar livros por assunto. Tente novamente mais tarde.', 0, $e);
+            throw new RepositoryException('Erro ao consultar livros por assunto. Tente novamente mais tarde.', 0, $e);
         }
     }
 
@@ -172,7 +186,7 @@ class LivroRepository extends ServiceEntityRepository
      * feita na camada de serviço/use-case antes de chamar este método.
      * O repositório é responsável apenas pela persistência.
      *
-     * @throws \RepositoryException em falha de persistência ou violação de constraint
+     * @throws RepositoryException em falha de persistência ou violação de constraint
      */
     public function save(Livro $livro, bool $flush = false): void
     {
@@ -194,7 +208,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException(
+            throw new RepositoryException(
                 'O livro foi modificado por outro processo. Recarregue e tente novamente.', 0, $e
             );
         } catch (UniqueConstraintViolationException $e) {
@@ -203,7 +217,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException(
+            throw new RepositoryException(
                 'Já existe um livro cadastrado com esses dados.', 0, $e
             );
         } catch (\Throwable $e) {
@@ -213,7 +227,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e,
             ]);
 
-            throw new \RepositoryException(
+            throw new RepositoryException(
                 'Erro interno ao salvar o livro.',
                 previous: $e
             );
@@ -239,7 +253,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RepositoryException(
+            throw new RepositoryException(
                 'O livro foi modificado por outro processo. Recarregue e tente novamente.', 0, $e
             );
         } catch (\Throwable $e) {
@@ -249,7 +263,7 @@ class LivroRepository extends ServiceEntityRepository
                 'exception' => $e,
             ]);
 
-            throw new \RepositoryException(
+            throw new RepositoryException(
                 'Erro interno ao salvar o livro.',
                 previous: $e
             );

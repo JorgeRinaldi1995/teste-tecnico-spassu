@@ -12,6 +12,9 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @extends ServiceEntityRepository<Autor>
+ */
 class AutorRepository extends ServiceEntityRepository
 {
     public function __construct(
@@ -51,7 +54,7 @@ class AutorRepository extends ServiceEntityRepository
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException("Inconsistência de dados: mais de um autor encontrado para o código {$codl}.", 0, $e);
+            throw new \RuntimeException("Inconsistência de dados: mais de um autor encontrado para o código {$codau}.", 0, $e);
         } catch (ORMException $e) {
             $this->logger->error('Erro de ORM ao buscar autor com relações.', [
                 'codau'      => $codau,

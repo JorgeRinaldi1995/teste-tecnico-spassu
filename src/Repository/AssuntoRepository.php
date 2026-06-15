@@ -12,6 +12,9 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @extends ServiceEntityRepository<Assunto>
+ */
 class AssuntoRepository extends ServiceEntityRepository
 {
     public function __construct(
