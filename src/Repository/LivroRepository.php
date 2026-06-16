@@ -11,7 +11,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use App\Exception\RepositoryException;
+use App\Exception\Repository\RepositoryException;
 
 /**
  * @extends ServiceEntityRepository<Livro>

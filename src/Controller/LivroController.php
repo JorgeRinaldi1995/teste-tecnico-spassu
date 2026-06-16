@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Psr\Log\LoggerInterface;
+use App\Exception\Livro\LivroInvalidoException;
 
 /**
  * Controller responsável pelo gerenciamento de livros.
@@ -31,7 +33,8 @@ class LivroController extends AbstractController
      * @param LivroService $livroService Serviço responsável pelas regras de negócio dos livros.
      */
     public function __construct(
-        private readonly LivroService $livroService
+        private readonly LivroService $livroService,
+        private readonly LoggerInterface $logger
     ) {}
 
     /** @var list<int> */
@@ -87,10 +90,25 @@ class LivroController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $this->livroService->criar($livro);
+            try {
+                $this->livroService->criar($livro);
 
-            $this->addFlash('success', 'Livro cadastrado com sucesso!');
-            return $this->redirectToRoute('livro_index');
+                $this->addFlash(
+                    'success',
+                    'Livro cadastrado com sucesso!'
+                );
+
+                return $this->redirectToRoute('livro_index');
+
+            } catch (LivroInvalidoException $e) {
+
+                foreach ($e->getViolacoes() as $violacao) {
+                    $this->logger->error($violacao->getMessage(), ['exception' => $violacao]);
+                }
+            } catch (\Throwable $e) {
+                $this->logger->error('Erro inesperado ao criar livro', ['exception' => $e]);
+                $this->addFlash('error', 'Erro inesperado. Tente novamente mais tarde.');
+            }
         }
 
         return $this->render('livro/novo.html.twig', [
@@ -133,14 +151,26 @@ class LivroController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $this->livroService->atualizar($livro);
+            try {
+                $this->livroService->atualizar($livro);
 
-            $this->addFlash(
-                'success',
-                'Livro atualizado com sucesso!'
-            );
+                $this->addFlash(
+                    'success',
+                    'Livro atualizado com sucesso!'
+                );
 
-            return $this->redirectToRoute('livro_index');
+                return $this->redirectToRoute('livro_index');
+
+            } catch (LivroInvalidoException $e) {
+
+                foreach ($e->getViolacoes() as $violacao) {
+                    $this->logger->error($violacao->getMessage(), ['exception' => $violacao]);
+                }
+
+            } catch (\Throwable $e) {
+                $this->logger->error('Erro inesperado ao criar livro', ['exception' => $e]);
+                $this->addFlash('error', 'Erro inesperado. Tente novamente mais tarde.');
+            }
         }
 
         return $this->render('livro/editar.html.twig', [
