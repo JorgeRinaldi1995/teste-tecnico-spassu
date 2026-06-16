@@ -203,8 +203,8 @@ class LivroService
         if ($livro->getEdicao() <= 0) {
             $violacoes[] = new LivroSemEdicaoException();
         }
-
-        if ($livro->getAnoPublicacao() > (int) date('Y')) {
+        
+        if ($livro->getAnoPublicacao() <= 0 || $livro->getAnoPublicacao() > (int) date('Y')) {
             $violacoes[] = new AnoPublicacaoInvalidoException();
         }
 
