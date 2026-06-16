@@ -13,7 +13,8 @@ import './js/alert.js';
 
 import { initLivroForm } from './js/livro-form.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('turbo:load', () => {
+    console.log('turbo load');
     initLivroForm();
 });
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

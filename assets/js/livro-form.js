@@ -1,4 +1,5 @@
 export function initLivroForm() {
+    
     const anoInput = document.querySelector('#livro_anoPublicacao');
     const valorInput = document.querySelector('#livro_valor');
 
