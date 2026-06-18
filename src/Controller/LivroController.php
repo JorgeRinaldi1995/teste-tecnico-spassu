@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Psr\Log\LoggerInterface;
 use App\Exception\Livro\LivroInvalidoException;
+use App\Exception\Livro\LivroNaoEncontradoException;
 
 /**
  * Controller responsável pelo gerenciamento de livros.
@@ -122,10 +123,16 @@ class LivroController extends AbstractController
      * @param int $codl Código identificador do livro.
      *
      * @return Response Página de detalhes.
+     * 
+     * @throws @throws LivroNaoEncontradoException Se nenhum livro for encontrado com o código informado.
      */
     #[Route('/{codl}', name: 'livro_show', methods: ['GET'], requirements: ['codl' => '\d+'])]
     public function show(int $codl): Response {
-        $livro = $this->livroService->buscarPorCodigo($codl);
+        try {
+            $livro = $this->livroService->buscarPorCodigo($codl);
+        } catch (LivroNaoEncontradoException $e) {
+            throw $this->createNotFoundException($e->getMessage(), $e);
+        }
 
         return $this->render('livro/show.html.twig', [
             'livro' => $livro,
@@ -183,14 +190,24 @@ class LivroController extends AbstractController
      * Remove um livro existente.
      *
      * @param Livro $livro Entidade carregada automaticamente pelo Symfony.
-     *
+     * @param Request $request Requisição HTTP.
+     * 
      * @return Response Redirecionamento para a listagem.
      */
     #[Route('/{codl}/remover', name: 'livro_remover', methods: ['POST'], requirements: ['codl' => '\d+'])]
     public function remover(
         #[MapEntity(id: 'codl')] Livro $livro,
+        Request $request,
     ): Response {
+        if (!$this->isCsrfTokenValid(
+            'delete' . $livro->getCodl(),
+            $request->request->get('_token')
+        )) {
+            throw $this->createAccessDeniedException();
+        }
         $this->livroService->remover($livro);
+
+        $this->addFlash('success', 'Livro removido com sucesso.');
 
         return $this->redirectToRoute('livro_index');
     }

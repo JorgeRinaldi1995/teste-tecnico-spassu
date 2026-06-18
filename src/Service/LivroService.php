@@ -84,17 +84,10 @@ class LivroService
      * @param int $codl Código (PK) do livro.
      *
      * @return Livro Livro encontrado.
-     *
-     * @throws LivroNaoEncontradoException Se nenhum livro for encontrado com o código informado.
-     *
      */
     public function buscarPorCodigo(int $codl): Livro
     {
         $livro = $this->livroRepository->findWithRelations($codl);
-
-        if (!$livro) {
-            throw new LivroNaoEncontradoException($codl);
-        }
 
         return $livro;
     }
@@ -200,12 +193,16 @@ class LivroService
             $violacoes[] = new LivroSemEditoraException();
         }
 
-        if ($livro->getEdicao() <= 0) {
+        if ($livro->getEdicao() <= 0){
             $violacoes[] = new LivroSemEdicaoException();
         }
         
-        if ($livro->getAnoPublicacao() <= 0 || $livro->getAnoPublicacao() > (int) date('Y')) {
-            $violacoes[] = new AnoPublicacaoInvalidoException();
+        if ($livro->getAnoPublicacao() <= 0) {
+            $violacoes[] = AnoPublicacaoInvalidoException::porNaoSerPositivo();
+        }
+
+        if ($livro->getAnoPublicacao() > (int) date('Y')) {
+            $violacoes[] = AnoPublicacaoInvalidoException::porUltrapassarAnoAtual();
         }
 
         if ($livro->getValor() <= 0) {

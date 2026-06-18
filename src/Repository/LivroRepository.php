@@ -34,7 +34,7 @@ class LivroRepository extends ServiceEntityRepository
      * Busca um Livro pelo código primário com autores e assuntos carregados.
      *
      * @throws RepositoryException em falha de infraestrutura
-     * @throws \InvalidArgumentException se $codl for inválido
+     * 
      */
 
     public function findWithRelations(int $codl): ?Livro
