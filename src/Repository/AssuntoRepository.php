@@ -11,9 +11,16 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Psr\Log\LoggerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Exception\Repository\RepositoryException;
 
 /**
  * @extends ServiceEntityRepository<Assunto>
+ * 
+ * @phpstan-type AssuntoResult array{
+ *     data: list<Assunto>,
+ *     total: int
+ * }
  */
 class AssuntoRepository extends ServiceEntityRepository
 {
@@ -27,19 +34,14 @@ class AssuntoRepository extends ServiceEntityRepository
     /**
      * Busca um assunto pelo código primário com autores e livros carregados.
      *
-     * @throws \RuntimeException em falha de infraestrutura
-     * @throws \InvalidArgumentException se $codl for inválido
+     * @throws RepositoryException em falha de infraestrutura
+     * 
      */
     public function findById(int $codas): ?Assunto
     {
-        if ($codas <= 0) {
-            throw new \InvalidArgumentException(
-                "O código do assunto deve ser um inteiro positivo, '{$codas}' fornecido."
-            );
-        }
-
         try {
-            return $this->createQueryBuilder('s')
+            /** @var Assunto|null $livro */
+            $assunto = $this->createQueryBuilder('s')
                 ->leftJoin('s.livros', 'l')
                 ->leftJoin('l.autores', 'a')
                 ->addSelect('l', 'a')
@@ -47,13 +49,27 @@ class AssuntoRepository extends ServiceEntityRepository
                 ->setParameter('codas', $codas)
                 ->getQuery()
                 ->getOneOrNullResult();
+            return $assunto;
+
         } catch (NonUniqueResultException $e) {
             $this->logger->error('Resultado não único ao buscar assunto por codas.', [
                 'codas'      => $codas,
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException("Inconsistência de dados: mais de um assunto encontrado para o código {$codas}.", 0, $e);
+            throw new RepositoryException("Inconsistência de dados: mais de um assunto encontrado para o código {$codas}.", 0, $e);
+
+        } catch (\Throwable $e) {
+
+            $this->logger->critical('Erro inesperado ao buscar assunto.', [
+                'codas' => $codas,
+                'exception' => $e,
+            ]);
+
+            throw new \RuntimeException(
+                'Erro ao consultar assunto.',
+                previous: $e
+            );
         }
     }
 
@@ -62,28 +78,36 @@ class AssuntoRepository extends ServiceEntityRepository
      *
      * @return Assunto[]
      *
-     * @throws \RuntimeException em falha de infraestrutura
+     * @throws RepositoryException em falha de infraestrutura
      */
     public function findAllAssuntos(    
         int $limit = 20,
         int $offset = 0
     ): array {
         try {
-            return $this->createQueryBuilder('s')
-                ->leftJoin('s.livros', 'l')
+            $qb = $this->createQueryBuilder('s')
+                ->innerJoin('s.livros', 'l')
                 ->addSelect('l')
                 ->orderBy('s.descricao', 'ASC')
                 ->setMaxResults($limit)
-                ->setFirstResult($offset)
-                ->getQuery()
-                ->getResult();
+                ->setFirstResult($offset);
+
+            $paginator = new Paginator($qb->getQuery(), fetchJoinCollection: true);
+
+            /** @var list<Assuntos> $assuntos */
+            $assuntos = array_values(iterator_to_array($paginator));
+
+            return [
+                'data'  => $assuntos,
+                'total' => count($paginator),
+            ];
         
-        } catch (ORMException $e) {
-            $this->logger->error('Erro ORM ao listar livros com relações.', [
+        } catch (Throwable $e) {
+            $this->logger->error('Erro ORM ao listar assuntos com relações.', [
                 'exception' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException('Erro ao listar os assuntos. Tente novamente mais tarde.', 0, $e);
+            throw new RepositoryException('Erro ao listar os assuntos. Tente novamente mais tarde.', 0, $e);
         }
     }
 
