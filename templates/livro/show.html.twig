@@ -4,47 +4,99 @@
 
 {% block body %}
 
-    <h1>{{ livro.titulo }}</h1>
+<div class="container py-4">
 
-    <dl>
-        <dt>Editora</dt>
-        <dd>{{ livro.editora ?? '—' }}</dd>
+    {% include 'partials/_crud_header.html.twig' with {
+        title: 'Detalhes do Livro',
+        back_route: 'livro_index',
+        edit_route: 'livro_edit',
+        route_params: { codl: livro.codl }
+    } %}
 
-        <dt>Edição</dt>
-        <dd>{{ livro.edicao ?? '—' }}</dd>
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
 
-        <dt>Ano de Publicação</dt>
-        <dd>{{ livro.anoPublicacao ?? '—' }}</dd>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
 
-        <dt>Preço</dt>
-        <dd><span>R$: </span>{{ livro.valor is not null ? livro.valor|number_format(2, ',', '.') : '—' }}</dd>
-    </dl>
-    <section>
-        <h2>Autores</h2>
+                    <h2 class="card-title mb-4 text-center text-md-start">
+                        {{ livro.titulo }}
+                    </h2>
 
-        {% if livro.autores is empty %}
-            <p>Nenhum autor cadastrado.</p>
-        {% else %}
-            <ul>
-                {% for autor in livro.autores %}
-                    <li>{{ autor.nome }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
-    <section>
-        <h2>Assuntos</h2>
+                    <dl class="row mb-0">
 
-        {% if livro.assuntos is empty %}
-            <p>Nenhum assunto cadastrado.</p>
-        {% else %}
-            <ul>
-                {% for assunto in livro.assuntos %}
-                    <li>{{ assunto.descricao }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
+                        <dt class="col-5 col-md-4">Editora</dt>
+                        <dd class="col-7 col-md-8">
+                            {{ livro.editora ?? '—' }}
+                        </dd>
+
+                        <dt class="col-5 col-md-4">Edição</dt>
+                        <dd class="col-7 col-md-8">
+                            {{ livro.edicao ?? '—' }}
+                        </dd>
+
+                        <dt class="col-5 col-md-4">Ano</dt>
+                        <dd class="col-7 col-md-8">
+                            {{ livro.anoPublicacao ?? '—' }}
+                        </dd>
+
+                        <dt class="col-5 col-md-4">Preço</dt>
+                        <dd class="col-7 col-md-8">
+                            {{ livro.valor is not null
+                                ? 'R$ ' ~ livro.valor|number_format(2, ',', '.')
+                                : '—'
+                            }}
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+
+                    <h3 class="h5 mb-3">Autores</h3>
+
+                    {% if livro.autores is empty %}
+                        <p class="text-muted mb-0">
+                            Nenhum autor cadastrado.
+                        </p>
+                    {% else %}
+                        <ul class="list-group">
+                            {% for autor in livro.autores %}
+                                <li class="list-group-item">
+                                    {{ autor.nome }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+
+                    <h3 class="h5 mb-3">Assuntos</h3>
+
+                    {% if livro.assuntos is empty %}
+                        <p class="text-muted mb-0">
+                            Nenhum assunto cadastrado.
+                        </p>
+                    {% else %}
+                        <ul class="list-group">
+                            {% for assunto in livro.assuntos %}
+                                <li class="list-group-item">
+                                    {{ assunto.descricao }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 <a
     href="{{ path('livro_editar', {'codl': livro.codl}) }}"
     class="btn btn-warning"

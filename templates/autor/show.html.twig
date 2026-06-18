@@ -2,7 +2,12 @@
 
 {% block body %}
 
-<h1>Detalhes do Autor</h1>
+{% include 'partials/_crud_header.html.twig' with {
+    title: 'Detalhes do Autor',
+    back_route: 'autor_index',
+    edit_route: 'autor_edit',
+    route_params: { codau: autor.codau }
+} %}
 
 <table class="table table-bordered">
 
