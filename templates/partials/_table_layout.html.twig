@@ -1,17 +1,19 @@
-<table class="table table-striped table-hover">
+<div class="library-table">
+    <table class="table table-striped table-hover">
 
-    <thead>
-        <tr>
-            {% block table_header %}
+        <thead>
+            <tr>
+                {% block table_header %}
+                {% endblock %}
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% block table_body %}
             {% endblock %}
-        </tr>
-    </thead>
 
-    <tbody>
+        </tbody>
 
-        {% block table_body %}
-        {% endblock %}
-
-    </tbody>
-
-</table>
+    </table>
+</div>

@@ -1,0 +1,11 @@
+.library-table{
+    max-width: 95vw;
+    margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+    .library-table{
+        overflow-x: scroll;
+    }
+
+}
