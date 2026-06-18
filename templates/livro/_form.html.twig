@@ -3,19 +3,25 @@
 {% set back_route = 'livro_index' %}
 
 {% block form_fields %}
+    <div class="library-form__row">
+        <div class="library-form__group">
+            {{ form_row(form.titulo) }}
 
-    {{ form_row(form.titulo) }}
+            {{ form_row(form.editora) }}
 
-    {{ form_row(form.editora) }}
+            {{ form_row(form.edicao) }}
+        </div>
+        <div class="library-form__group">
+            {{ form_row(form.anoPublicacao) }}
 
-    {{ form_row(form.edicao) }}
+            {{ form_row(form.valor) }}
+        </div>
+    </div>
+    <div class="library-form__row">
+        <div class="library-form__group">
+            {{ form_row(form.autores) }}
 
-    {{ form_row(form.anoPublicacao) }}
-
-    {{ form_row(form.valor) }}
-
-    {{ form_row(form.autores) }}
-
-    {{ form_row(form.assuntos) }}
-
+            {{ form_row(form.assuntos) }}
+        </div>
+    </div>
 {% endblock %}

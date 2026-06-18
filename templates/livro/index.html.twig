@@ -34,9 +34,11 @@
                 {{ include('partials/_table_actions.html.twig', {
                     show_route: 'livro_show',
                     edit_route: 'livro_editar',
+                    delete_route: 'livro_remover',
                     route_params: {
                         codl: livro.codl
-                    }
+                    },
+                    delete_token_id: 'delete' ~ livro.codl
                 }) }}
             </td>
         </tr>

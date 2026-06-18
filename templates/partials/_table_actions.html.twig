@@ -14,4 +14,18 @@
         </a>
     {% endif %}
 
+    {% if delete_route is defined %}
+        <form method="post"
+            action="{{ path(delete_route, route_params) }}"
+            onsubmit="return confirm('Deseja realmente excluir este registro?');">
+
+            <input type="hidden"
+                name="_token"
+                value="{{ csrf_token(delete_token_id) }}">
+
+            <button class="btn btn-danger btn-sm">
+                Excluir
+            </button>
+        </form>
+    {% endif %}
 </div>

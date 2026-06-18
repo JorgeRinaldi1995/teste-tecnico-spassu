@@ -34,9 +34,11 @@
                         {{ include('partials/_table_actions.html.twig', {
                             show_route: 'assunto_show',
                             edit_route: 'assunto_editar',
+                            delete_route: 'assunto_remover',
                             route_params: {
                                 codas: assunto.codas
-                            }
+                            },
+                            delete_token_id: 'delete' ~ assunto.codas
                         }) }}
 
                     </td>
@@ -56,5 +58,14 @@
         {% endblock %}
 
     {% endembed %}
+{{ include('partials/_paginacao.html.twig', {
+    paginaAtual:        paginaAtual,
+    totalPaginas:       totalPaginas,
+    limiteAtual:        limiteAtual,
+    limitesPermitidos:  limitesPermitidos,
+    rota:               'assunto_index',
+    params:             {}
+    }) 
+}}
 
 {% endblock %}
