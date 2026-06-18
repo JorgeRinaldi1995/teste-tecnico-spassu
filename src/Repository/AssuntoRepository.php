@@ -86,7 +86,7 @@ class AssuntoRepository extends ServiceEntityRepository
     ): array {
         try {
             $qb = $this->createQueryBuilder('s')
-                ->innerJoin('s.livros', 'l')
+                ->leftJoin('s.livros', 'l')
                 ->addSelect('l')
                 ->orderBy('s.descricao', 'ASC')
                 ->setMaxResults($limit)
