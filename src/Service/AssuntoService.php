@@ -35,7 +35,7 @@ class AssuntoService
     }
 
     /**
-     * Retorna uma lista paginada de autores.
+     * Retorna uma lista paginada de assuntos.
      *
      * @param int $pagina Número da página desejada (mínimo: 1).
      * @param int $limite Quantidade de registros por página (entre 1 e 100).
@@ -84,7 +84,7 @@ class AssuntoService
      */
     public function buscarPorCodigo(int $codas): ?Assunto
     {
-        return $assunto = $this->repository->findById($codas);
+        $assunto = $this->repository->findById($codas);
 
         if (!$assunto) {
             throw new AssuntoNaoEncontradoException($codas);

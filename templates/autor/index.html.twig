@@ -2,29 +2,24 @@
 
 {% block body %}
 
-<div class="d-flex justify-content-between mb-3">
+    {{ include('partials/_crud_header.html.twig', {
+        title: 'Autores',
+        new_route: 'autor_novo',
+        new_label: 'Novo Assunto'
+    }) }}
 
-    <h1>Autores</h1>
 
-    <a href="{{ path('autor_novo') }}"
-       class="btn btn-primary">
-        Novo Autor
-    </a>
 
-</div>
+{% embed 'partials/_table_layout.html.twig' %}
 
-<table class="table table-striped">
+    {% block table_header %}
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Livros</th>
+        <th>Ações</th>
+    {% endblock %}
 
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Nome</th>
-            <th>Livros</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-
-    <tbody>
+    {% block table_body %}
 
     {% for autor in autores %}
         <tr>
@@ -37,23 +32,39 @@
 
             <td>
 
-                <a href="{{ path('autor_show', {'codau': autor.codau}) }}"
-                   class="btn btn-info btn-sm">
-                    Ver
-                </a>
-
-                <a href="{{ path('autor_editar', {'codau': autor.codau}) }}"
-                   class="btn btn-warning btn-sm">
-                    Editar
-                </a>
+                {{ include('partials/_table_actions.html.twig', {
+                    show_route: 'autor_show',
+                    edit_route: 'autor_editar',
+                    delete_route: 'autor_remover',
+                    route_params: {
+                        codau: autor.codau
+                    },
+                    delete_token_id: 'delete' ~ autor.codau
+                }) }}
 
             </td>
 
         </tr>
-    {% endfor %}
+        {% else %}
 
-    </tbody>
+            <tr>
+                <td colspan="4">
+                    Nenhum assunto encontrado.
+                </td>
+            </tr>
 
-</table>
+        {% endfor %}
+    {% endblock %}
+{% endembed %}
+
+{{ include('partials/_paginacao.html.twig', {
+    paginaAtual:        paginaAtual,
+    totalPaginas:       totalPaginas,
+    limiteAtual:        limiteAtual,
+    limitesPermitidos:  limitesPermitidos,
+    rota:               'autor_index',
+    params:             {}
+    }) 
+}}
 
 {% endblock %}

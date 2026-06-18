@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Psr\Log\LoggerInterface;
+use App\Exception\Assunto\AssuntoInvalidoException;
+use App\Exception\Assunto\AssuntoNaoEncontradoException;
 
 /**
  * Controller responsável pelo gerenciamento de assuntos.
@@ -121,15 +123,15 @@ class AssuntoController extends AbstractController
      * @param int $codas Código identificador do assunto.
      *
      * @return Response Página de detalhes.
+     * 
+     * @throws AssuntoNaoEncontradoException Se nenhum livro for encontrado com o código informado.
      */
     #[Route('/{codas}', name: 'assunto_show', methods: ['GET'], requirements: ['codas' => '\d+'])]
     public function show(int $codas): Response {
-        $assunto = $this->assuntoService->buscarPorCodigo($codas);
-
-        if (!$assunto) {
-            throw $this->createNotFoundException(
-                'Assunto não encontrado.'
-            );
+        try {
+            $assunto = $this->assuntoService->buscarPorCodigo($codas);
+        } catch (AssuntoNaoEncontradoException $e) {
+            throw $this->createNotFoundException($e->getMessage(), $e);
         }
 
         return $this->render('assunto/show.html.twig', [

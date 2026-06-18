@@ -10,10 +10,17 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
+use App\Exception\Repository\RepositoryException;
 
 /**
  * @extends ServiceEntityRepository<Autor>
+ * 
+ * @phpstan-type AutorResult array{
+ *     data: list<Autor>,
+ *     total: int
+ * }
  */
 class AutorRepository extends ServiceEntityRepository
 {
@@ -28,18 +35,12 @@ class AutorRepository extends ServiceEntityRepository
      * Busca um Autor pelo código primário com livros e assuntos carregados.
      *
      * @throws \RuntimeException em falha de infraestrutura
-     * @throws \InvalidArgumentException se $codau for inválido
+     * 
      */
     public function findById(int $codau): ?Autor
     {
-        if ($codau <= 0) {
-            throw new \InvalidArgumentException(
-                "O código do autor deve ser um inteiro positivo, '{$codau}' fornecido."
-            );
-        }
-
         try {
-            return $this->createQueryBuilder('a')
+            $autor = $this->createQueryBuilder('a')
                 ->leftJoin('a.livros', 'l')
                 ->leftJoin('l.assuntos', 's')
                 ->addSelect('l', 's')
@@ -47,9 +48,10 @@ class AutorRepository extends ServiceEntityRepository
                 ->setParameter('codau', $codau)
                 ->getQuery()
                 ->getOneOrNullResult();
+            return $autor;
 
         } catch (NonUniqueResultException $e) {
-            $this->logger->error('Resultado não único ao buscar autor por codl.', [
+            $this->logger->error('Resultado não único ao buscar autor por codau.', [
                 'codau'      => $codau,
                 'exception' => $e->getMessage(),
             ]);
@@ -66,28 +68,36 @@ class AutorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Retorna todos os assuntos relacionados a livros, ordenados por descricao.
+     * Retorna todos os autores ordenados por nome.
      *
      * @return Autor[]
      *
-     * @throws \RuntimeException em falha de infraestrutura
+     * @throws RepositoryException em falha de infraestrutura
      */
-    public function findAllAtores(    
+    public function findAll(    
         int $limit = 20,
         int $offset = 0
     ): array {
         try {
-            return $this->createQueryBuilder('a')
+            $qb = $this->createQueryBuilder('a')
                 ->leftJoin('a.livros', 'l')
                 ->addSelect('l')
                 ->orderBy('a.nome', 'ASC')
                 ->setMaxResults($limit)
-                ->setFirstResult($offset)
-                ->getQuery()
-                ->getResult();
+                ->setFirstResult($offset);
         
+            $paginator = new Paginator($qb->getQuery(), fetchJoinCollection: true);
+
+            /** @var list<Autor> $autores */
+            $autores = array_values(iterator_to_array($paginator));
+
+            return [
+                'data'  => $autores,
+                'total' => count($paginator),
+            ];
+
         } catch (ORMException $e) {
-            $this->logger->error('Erro ORM ao listar livros com relações.', [
+            $this->logger->error('Erro ORM ao listar autores.', [
                 'exception' => $e->getMessage(),
             ]);
 

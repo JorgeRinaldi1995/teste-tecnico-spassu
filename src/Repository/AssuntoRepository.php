@@ -74,7 +74,7 @@ class AssuntoRepository extends ServiceEntityRepository
     }
 
     /**
-     * Retorna todos os assuntos relacionados a livros, ordenados por descricao.
+     * Retorna todos os assuntos ordenados por descricao.
      *
      * @return Assunto[]
      *

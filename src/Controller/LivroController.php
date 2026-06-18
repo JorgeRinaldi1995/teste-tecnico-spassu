@@ -124,7 +124,7 @@ class LivroController extends AbstractController
      *
      * @return Response Página de detalhes.
      * 
-     * @throws @throws LivroNaoEncontradoException Se nenhum livro for encontrado com o código informado.
+     * @throws LivroNaoEncontradoException Se nenhum livro for encontrado com o código informado.
      */
     #[Route('/{codl}', name: 'livro_show', methods: ['GET'], requirements: ['codl' => '\d+'])]
     public function show(int $codl): Response {

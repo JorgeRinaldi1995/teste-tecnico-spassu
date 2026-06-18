@@ -2,18 +2,12 @@
 
 namespace App\Exception\Assunto;
 
-class AssuntoNaoEncontradoException extends \DomainException
+class AssuntoNaoEncontradoException extends \RuntimeException
 {
-    /** @param list<\DomainException> $violacoes */
-    public function __construct(
-        private readonly array $violacoes
-    ) {
-        parent::__construct('Assunto não encontrado.');
-    }
-
-    /** @return list<\DomainException> */
-    public function getViolacoes(): array
+    public function __construct(int $codigo)
     {
-        return $this->violacoes;
+        parent::__construct(
+            sprintf('Assunto %d não encontrado.', $codigo)
+        );
     }
 }
